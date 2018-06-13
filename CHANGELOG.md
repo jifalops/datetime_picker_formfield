@@ -1,3 +1,7 @@
+## [0.0.3] - June 13, 2018
+
+* Added License (MIT).
+
 ## [0.0.2] - June 13, 2018
 
 * Fix pubspec.yaml Flutter SDK version requirements.
