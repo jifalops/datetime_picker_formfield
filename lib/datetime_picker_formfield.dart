@@ -30,7 +30,7 @@ class DateTimePickerFormField extends FormField<DateTime> {
   final int maxLines;
   final int maxLength;
   final List<TextInputFormatter> inputFormatters;
-  final enabled;
+  final bool enabled;
   final ValueChanged<DateTime> onChanged;
   DateTimePickerFormField({
     Key key,

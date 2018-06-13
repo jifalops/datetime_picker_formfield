@@ -45,7 +45,7 @@ class TimePickerFormField extends FormField<TimeOfDay> {
   final int maxLines;
   final int maxLength;
   final List<TextInputFormatter> inputFormatters;
-  final enabled;
+  final bool enabled;
   final ValueChanged<TimeOfDay> onChanged;
   TimePickerFormField({
     Key key,
