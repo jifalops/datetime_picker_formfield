@@ -1,0 +1,14 @@
+name: datetime_picker_formfield
+description: A Flutter widget that wraps a TextFormField and integrates the date and/or time picker dialogs.
+version: 0.0.1
+author: Jacob Phillips
+homepage: https://github.com/jifalops/datetime_picker_formfield
+
+dependencies:
+  flutter:
+    sdk: flutter
+  intl: any
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
