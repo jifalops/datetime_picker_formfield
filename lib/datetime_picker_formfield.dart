@@ -257,9 +257,4 @@ DateTime _toDate(String string, DateFormat formatter) {
   return null;
 }
 
-DateTime startOfDay(DateTime date) => date.subtract(Duration(
-    hours: date.hour,
-    minutes: date.minute,
-    seconds: date.second,
-    milliseconds: date.millisecond,
-    microseconds: date.microsecond));
+DateTime startOfDay(DateTime date) => DateTime(date.year, date.month, date.day);
