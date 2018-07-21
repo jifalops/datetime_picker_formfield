@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import '../lib/datetime_picker_formfield.dart';
-import '../lib/time_picker_formfield.dart';
+import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
+import 'package:datetime_picker_formfield/time_picker_formfield.dart';
 
 void main() => runApp(new MyApp());
 
