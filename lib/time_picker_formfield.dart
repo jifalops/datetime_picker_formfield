@@ -24,10 +24,26 @@ DateFormat toDateFormat(TimeOfDayFormat format) {
 /// A [FormField<TimeOfDay>] that uses a [TextField] to manage input.
 /// If it gains focus while empty, the time picker will be shown to the user.
 class TimePickerFormField extends FormField<TimeOfDay> {
+  /// For representing the time as a string e.g.
+  /// `DateFormat("h:mma")` (9:24pm). You can also use the helper function
+  /// [toDateFormat(TimeOfDayFormat)].
   final DateFormat format;
+
+  /// If defined the TextField [decoration]'s [suffixIcon] will be
+  /// overridden to reset the input using the icon defined here.
+  /// Set this to `null` to stop that behavior. Defaults to [Icons.close].
   final IconData resetIcon;
+
+  /// For validating the [TimeOfDay]. The value passed will be `null` if
+  /// [format] fails to parse the text.
   final FormFieldValidator<TimeOfDay> validator;
+
+  /// Called when an enclosing form is saved. The value passed will be `null`
+  /// if [format] fails to parse the text.
   final FormFieldSetter<TimeOfDay> onSaved;
+
+  /// Called when an enclosing form is submitted. The value passed will be
+  /// `null` if [format] fails to parse the text.
   final ValueChanged<TimeOfDay> onFieldSubmitted;
   final TextEditingController controller;
   final FocusNode focusNode;
@@ -36,7 +52,12 @@ class TimePickerFormField extends FormField<TimeOfDay> {
   final TextInputType keyboardType;
   final TextStyle style;
   final TextAlign textAlign;
+
+  /// The initial value of the text field before user interaction.
   final TimeOfDay initialValue;
+
+  /// The initial time prefilled in the picker dialog when it is shown.
+  /// Defaults to noon.
   final TimeOfDay initialTime;
   final bool autofocus;
   final bool obscureText;
@@ -46,38 +67,20 @@ class TimePickerFormField extends FormField<TimeOfDay> {
   final int maxLength;
   final List<TextInputFormatter> inputFormatters;
   final bool enabled;
+
+  /// Called whenever the state's value changes, e.g. after the picker value
+  /// has been selected or when the field loses focus. To listen for all text
+  /// changes, use the [controller] and [focusNode].
   final ValueChanged<TimeOfDay> onChanged;
+
   TimePickerFormField({
     Key key,
-
-    /// For representing the time as a string e.g.
-    /// `DateFormat("h:mma")` (9:24pm). You can also use the helper function
-    /// [toDateFormat(TimeOfDayFormat)].
     @required this.format,
-
-    /// Called whenever the state's value changes, e.g. after the picker value
-    /// has been selected or when the field loses focus. To listen for all text
-    /// changes, use the [controller] and [focusNode].
     this.onChanged,
-
-    /// By default the TextField [decoration]'s [suffixIcon] will be
-    /// overridden to reset the input using the icon defined here.
-    /// Set this to `null` to stop that behavior.
     this.resetIcon: Icons.close,
-
-    /// The initial time prefilled in the picker dialog when it is shown.
     this.initialTime: const TimeOfDay(hour: 12, minute: 0),
-
-    /// For validating the [TimeOfDay]. The value passed will be `null` if
-    /// [format] fails to parse the text.
     this.validator,
-
-    /// Called when an enclosing form is saved. The value passed will be `null`
-    /// if [format] fails to parse the text.
     this.onSaved,
-
-    /// Called when an enclosing form is submitted. The value passed will be
-    /// `null` if [format] fails to parse the text.
     this.onFieldSubmitted,
     bool autovalidate: false,
 

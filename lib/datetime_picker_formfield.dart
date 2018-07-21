@@ -7,13 +7,42 @@ import 'package:flutter/services.dart' show TextInputFormatter;
 /// If it gains focus while empty, the date and/or time pickers will be shown
 /// to the user.
 class DateTimePickerFormField extends FormField<DateTime> {
+  /// Whether to show the time picker after a date has been chosen.
+  /// To show the time picker only, use [TimePickerFormField].
   final bool dateOnly;
+
+  /// For representing the date as a string e.g.
+  /// `DateFormat("EEEE, MMMM d, yyyy 'at' h:mma")`
+  /// (Sunday, June 3, 2018 at 9:24pm)
   final DateFormat format;
-  final DateTime initialDate, firstDate, lastDate;
+
+  /// Where the calendar will start when shown. Defaults to the current date.
+  final DateTime initialDate;
+
+  /// The earliest choosable date. Defaults to 1900.
+  final DateTime firstDate;
+
+  /// The latest choosable date. Defaults to 2100.
+  final DateTime lastDate;
+
+  /// The initial time prefilled in the picker dialog when it is shown.
   final TimeOfDay initialTime;
+
+  /// If defined the TextField [decoration]'s [suffixIcon] will be
+  /// overridden to reset the input using the icon defined here.
+  /// Set this to `null` to stop that behavior. Defaults to [Icons.close].
   final IconData resetIcon;
+
+  /// For validating the [DateTime]. The value passed will be `null` if
+  /// [format] fails to parse the text.
   final FormFieldValidator<DateTime> validator;
+
+  /// Called when an enclosing form is saved. The value passed will be `null`
+  /// if [format] fails to parse the text.
   final FormFieldSetter<DateTime> onSaved;
+
+  /// Called when an enclosing form is submitted. The value passed will be
+  /// `null` if [format] fails to parse the text.
   final ValueChanged<DateTime> onFieldSubmitted;
   final TextEditingController controller;
   final FocusNode focusNode;
@@ -31,51 +60,24 @@ class DateTimePickerFormField extends FormField<DateTime> {
   final int maxLength;
   final List<TextInputFormatter> inputFormatters;
   final bool enabled;
+
+  /// Called whenever the state's value changes, e.g. after picker value(s)
+  /// have been selected or when the field loses focus. To listen for all text
+  /// changes, use the [controller] and [focusNode].
   final ValueChanged<DateTime> onChanged;
+
   DateTimePickerFormField({
     Key key,
-
-    /// For representing the date as a string e.g.
-    /// `DateFormat("EEEE, MMMM d, yyyy 'at' h:mma")`
-    /// (Sunday, June 3, 2018 at 9:24pm)
     @required this.format,
-
-    /// Which pickers this input should show. Either date, or date and time.
-    /// For time only, use [TimePickerFormField].
     this.dateOnly: false,
-
-    /// Called whenever the state's value changes, e.g. after picker value(s)
-    /// have been selected or when the field loses focus. To listen for all text
-    /// changes, use the [controller] and [focusNode].
     this.onChanged,
-
-    /// By default the TextField [decoration]'s [suffixIcon] will be
-    /// overridden to reset the input using the icon defined here.
-    /// Set this to `null` to stop that behavior.
     this.resetIcon: Icons.close,
-
-    /// Where the calendar will start when shown. Defaults to the current date.
     DateTime initialDate,
-
-    /// The earliest choosable date. Defaults to 1900.
     DateTime firstDate,
-
-    /// The latest choosable date. Defaults to 2100.
     DateTime lastDate,
-
-    /// The initial time prefilled in the picker dialog when it is shown.
     this.initialTime: const TimeOfDay(hour: 12, minute: 0),
-
-    /// For validating the [DateTime]. The value passed will be `null` if
-    /// [format] fails to parse the text.
     this.validator,
-
-    /// Called when an enclosing form is saved. The value passed will be `null`
-    /// if [format] fails to parse the text.
     this.onSaved,
-
-    /// Called when an enclosing form is submitted. The value passed will be
-    /// `null` if [format] fails to parse the text.
     this.onFieldSubmitted,
     bool autovalidate: false,
 

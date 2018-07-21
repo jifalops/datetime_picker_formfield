@@ -1,3 +1,7 @@
+## [0.1.1] - July 21, 2018
+
+* Fix and improve documentation.
+
 ## [0.1.0] - July 21, 2018
 
 * Support Dart 2.0
