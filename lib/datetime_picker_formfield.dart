@@ -228,6 +228,7 @@ class _DateTimePickerTextFormFieldState extends FormFieldState<DateTime> {
           return parent.validator(_toDate(value, parent.format));
         }
       },
+      autovalidate: parent.autovalidate,
       onSaved: (value) {
         if (parent.onSaved != null) {
           return parent.onSaved(_toDate(value, parent.format));
