@@ -1,3 +1,7 @@
+## [0.1.2] - July 21, 2018
+
+* Fix autovalidate setting.
+
 ## [0.1.1] - July 21, 2018
 
 * Fix and improve documentation.
