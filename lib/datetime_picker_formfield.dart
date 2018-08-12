@@ -41,6 +41,19 @@ class DateTimePickerFormField extends FormField<DateTime> {
   /// if [format] fails to parse the text.
   final FormFieldSetter<DateTime> onSaved;
 
+  /// Corresponds to the [showDatePicker()] parameter. Defaults to
+  /// [DatePickerMode.day].
+  final DatePickerMode initialDatePickerMode;
+
+  /// Corresponds to the [showDatePicker()] parameter.
+  final Locale locale;
+
+  /// Corresponds to the [showDatePicker()] parameter.
+  final bool Function(DateTime) selectableDayPredicate;
+
+  /// Corresponds to the [showDatePicker()] parameter.
+  final TextDirection textDirection;
+
   /// Called when an enclosing form is submitted. The value passed will be
   /// `null` if [format] fails to parse the text.
   final ValueChanged<DateTime> onFieldSubmitted;
@@ -80,6 +93,10 @@ class DateTimePickerFormField extends FormField<DateTime> {
     this.onSaved,
     this.onFieldSubmitted,
     bool autovalidate: false,
+    DatePickerMode initialDatePickerMode,
+    this.locale,
+    this.selectableDayPredicate,
+    this.textDirection,
 
     // TextField properties
     TextEditingController controller,
@@ -103,6 +120,7 @@ class DateTimePickerFormField extends FormField<DateTime> {
         initialDate = initialDate ?? DateTime.now(),
         firstDate = firstDate ?? DateTime(1900),
         lastDate = lastDate ?? DateTime(2100),
+        initialDatePickerMode = initialDatePickerMode ?? DatePickerMode.day,
         super(
             key: key,
             autovalidate: autovalidate,
@@ -171,7 +189,11 @@ class _DateTimePickerTextFormFieldState extends FormFieldState<DateTime> {
         context: context,
         firstDate: parent.firstDate,
         lastDate: parent.lastDate,
-        initialDate: parent.initialDate);
+        initialDate: parent.initialDate,
+        initialDatePickerMode: parent.initialDatePickerMode,
+        locale: parent.locale,
+        selectableDayPredicate: parent.selectableDayPredicate,
+        textDirection: parent.textDirection);
     if (date != null) {
       date = startOfDay(date);
       if (!parent.dateOnly) {

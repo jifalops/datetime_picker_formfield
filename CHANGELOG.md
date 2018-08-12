@@ -1,4 +1,8 @@
-## [0.1.2] - July 21, 2018
+## [0.1.3] - August 12, 2018
+
+* Add remaining parameters from showDatePicker().
+
+## [0.1.2] - August 9, 2018
 
 * Fix autovalidate setting.
 
