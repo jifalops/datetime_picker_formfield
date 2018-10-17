@@ -1,3 +1,8 @@
+## [0.1.4] - October 16, 2018
+
+* Setting `initialTime` to `null` will cause it to start at the current time when shown.
+* Add screenshot to readme.
+
 ## [0.1.3] - August 12, 2018
 
 * Add remaining parameters from showDatePicker().
