@@ -57,7 +57,7 @@ class TimePickerFormField extends FormField<TimeOfDay> {
   final TimeOfDay initialValue;
 
   /// The initial time prefilled in the picker dialog when it is shown.
-  /// Defaults to noon.
+  /// Defaults to noon. Explicitly set this to `null` to use the current time.
   final TimeOfDay initialTime;
   final bool autofocus;
   final bool obscureText;
@@ -169,7 +169,7 @@ class _TimePickerTextFormFieldState extends FormFieldState<TimeOfDay> {
   Future<TimeOfDay> getTimeInput(BuildContext context) async {
     return await showTimePicker(
       context: context,
-      initialTime: parent.initialTime,
+      initialTime: parent.initialTime ?? TimeOfDay.now(),
     );
   }
 

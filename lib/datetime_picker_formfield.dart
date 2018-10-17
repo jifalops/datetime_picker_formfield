@@ -25,7 +25,8 @@ class DateTimePickerFormField extends FormField<DateTime> {
   /// The latest choosable date. Defaults to 2100.
   final DateTime lastDate;
 
-  /// The initial time prefilled in the picker dialog when it is shown.
+  /// The initial time prefilled in the picker dialog when it is shown. Defaults
+  /// to noon. Explicitly set this to `null` to use the current time.
   final TimeOfDay initialTime;
 
   /// If defined the TextField [decoration]'s [suffixIcon] will be
@@ -199,7 +200,7 @@ class _DateTimePickerTextFormFieldState extends FormFieldState<DateTime> {
       if (!parent.dateOnly) {
         final time = await showTimePicker(
           context: context,
-          initialTime: parent.initialTime,
+          initialTime: parent.initialTime ?? TimeOfDay.now(),
         );
         if (time != null) {
           date = date.add(Duration(hours: time.hour, minutes: time.minute));
