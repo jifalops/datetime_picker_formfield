@@ -4,12 +4,16 @@ import 'package:intl/intl.dart' show DateFormat;
 import 'package:flutter/services.dart' show TextInputFormatter;
 
 /// A [FormField<DateTime>] that uses a [TextField] to manage input.
-/// If it gains focus while empty, the date and/or time pickers will be shown
-/// to the user.
+/// If it gains focus while empty, or if [showPickerAlways] is true, the date
+/// and/or time pickers will be shown to the user.
 class DateTimePickerFormField extends FormField<DateTime> {
   /// Whether to show the time picker after a date has been chosen.
   /// To show the time picker only, use [TimePickerFormField].
   final bool dateOnly;
+
+  /// Whether to show the date and/or time picker always, regardless if
+  /// the field is empty or non-empty.
+  final bool showPickerAlways;
 
   /// For representing the date as a string e.g.
   /// `DateFormat("EEEE, MMMM d, yyyy 'at' h:mma")`
@@ -84,6 +88,7 @@ class DateTimePickerFormField extends FormField<DateTime> {
     Key key,
     @required this.format,
     this.dateOnly: false,
+    this.showPickerAlways: false,
     this.onChanged,
     this.resetIcon: Icons.close,
     DateTime initialDate,
@@ -164,33 +169,44 @@ class _DateTimePickerTextFormFieldState extends FormFieldState<DateTime> {
   }
 
   void inputChanged() {
-    if (parent.controller.text.isEmpty &&
-        _previousValue.isEmpty &&
-        parent.focusNode.hasFocus) {
-      getDateTimeInput(context).then((date) {
-        parent.focusNode.unfocus();
-        setState(() {
-          parent.controller.text = _toString(date, parent.format);
-          setValue(date);
-        });
-      });
+    final bool dateTimeShowing = parent.controller.text.isEmpty &&
+      _previousValue.isEmpty &&
+      parent.focusNode.hasFocus;
+
+    if (dateTimeShowing) {
+      getDateTimeInput(context, parent.initialDate).then(_setValue);
     } else if (parent.resetIcon != null &&
         parent.controller.text.isEmpty == showResetIcon) {
       setState(() => showResetIcon = !showResetIcon);
       // parent.focusNode.unfocus();
     }
     _previousValue = parent.controller.text;
+    final newValue = _toDate(_previousValue, parent.format);
     if (!parent.focusNode.hasFocus) {
-      setValue(_toDate(parent.controller.text, parent.format));
+      setValue(newValue);
+    } else if (!dateTimeShowing && parent.showPickerAlways == true) {
+      getDateTimeInput(context, newValue ?? parent.initialDate).then(_setValue);
     }
   }
 
-  Future<DateTime> getDateTimeInput(BuildContext context) async {
+  void _setValue(DateTime date) {
+    parent.focusNode.unfocus();
+    // When Cancel is tapped, retain the previous value if present.
+    if (date == null && _previousValue.isNotEmpty) {
+      date = _toDate(_previousValue, parent.format);
+    }
+    setState(() {
+      parent.controller.text = _toString(date, parent.format);
+      setValue(date);
+    });
+  }
+
+  Future<DateTime> getDateTimeInput(BuildContext context, DateTime initialDate) async {
     var date = await showDatePicker(
         context: context,
         firstDate: parent.firstDate,
         lastDate: parent.lastDate,
-        initialDate: parent.initialDate,
+        initialDate: initialDate,
         initialDatePickerMode: parent.initialDatePickerMode,
         locale: parent.locale,
         selectableDayPredicate: parent.selectableDayPredicate,
