@@ -1,3 +1,7 @@
+## [0.1.5] - November 2, 2018
+
+* Add `editable` option to disable manual editing and always show the picker(s) when the field gains focus.
+
 ## [0.1.4] - October 16, 2018
 
 * Setting `initialTime` to `null` will cause it to start at the current time when shown.
