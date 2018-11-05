@@ -4,14 +4,12 @@ import 'package:intl/intl.dart' show DateFormat;
 import 'package:flutter/services.dart' show TextInputFormatter;
 
 /// A [FormField<DateTime>] that uses a [TextField] to manage input.
-/// If it gains focus while empty, or if [editable] is true, the date
-/// and/or time pickers will be shown to the user.
 class DateTimePickerFormField extends FormField<DateTime> {
   /// Whether to show the time picker after a date has been chosen.
   /// To show the time picker only, use [TimePickerFormField].
   final bool dateOnly;
 
-  /// Allow manual editing of the date. Defaults to true. If false, the
+  /// Allow manual editing of the date/time. Defaults to true. If false, the
   /// picker(s) will be shown every time the field gains focus.
   final bool editable;
 

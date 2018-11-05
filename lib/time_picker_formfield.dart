@@ -34,6 +34,10 @@ class TimePickerFormField extends FormField<TimeOfDay> {
   /// Set this to `null` to stop that behavior. Defaults to [Icons.close].
   final IconData resetIcon;
 
+  /// Allow manual editing of the date/time. Defaults to true. If false, the
+  /// picker(s) will be shown every time the field gains focus.
+  final bool editable;
+
   /// For validating the [TimeOfDay]. The value passed will be `null` if
   /// [format] fails to parse the text.
   final FormFieldValidator<TimeOfDay> validator;
@@ -76,6 +80,7 @@ class TimePickerFormField extends FormField<TimeOfDay> {
   TimePickerFormField({
     Key key,
     @required this.format,
+    this.editable: true,
     this.onChanged,
     this.resetIcon: Icons.close,
     this.initialTime: const TimeOfDay(hour: 12, minute: 0),
@@ -145,16 +150,12 @@ class _TimePickerTextFormFieldState extends FormFieldState<TimeOfDay> {
   }
 
   void inputChanged() {
-    if (parent.controller.text.isEmpty &&
+    final bool requiresInput = parent.controller.text.isEmpty &&
         _previousValue.isEmpty &&
-        parent.focusNode.hasFocus) {
-      getTimeInput(context).then((time) {
-        parent.focusNode.unfocus();
-        setState(() {
-          parent.controller.text = _toString(time, parent.format);
-          setValue(time);
-        });
-      });
+        parent.focusNode.hasFocus;
+
+    if (requiresInput) {
+      getTimeInput(context, parent.initialTime).then(_setValue);
     } else if (parent.resetIcon != null &&
         parent.controller.text.isEmpty == showResetIcon) {
       setState(() => showResetIcon = !showResetIcon);
@@ -162,14 +163,31 @@ class _TimePickerTextFormFieldState extends FormFieldState<TimeOfDay> {
     }
     _previousValue = parent.controller.text;
     if (!parent.focusNode.hasFocus) {
-      setValue(_toTime(parent.controller.text, parent.format));
+      setValue(_toTime(_previousValue, parent.format));
+    } else if (!requiresInput && !parent.editable) {
+      getTimeInput(context,
+              _toTime(_previousValue, parent.format) ?? parent.initialTime)
+          .then(_setValue);
     }
   }
 
-  Future<TimeOfDay> getTimeInput(BuildContext context) async {
+  void _setValue(TimeOfDay time) {
+    parent.focusNode.unfocus();
+    // When Cancel is tapped, retain the previous value if present.
+    if (time == null && _previousValue.isNotEmpty) {
+      time = _toTime(_previousValue, parent.format);
+    }
+    setState(() {
+      parent.controller.text = _toString(time, parent.format);
+      setValue(time);
+    });
+  }
+
+  Future<TimeOfDay> getTimeInput(
+      BuildContext context, TimeOfDay initialTime) async {
     return await showTimePicker(
       context: context,
-      initialTime: parent.initialTime ?? TimeOfDay.now(),
+      initialTime: initialTime ?? TimeOfDay.now(),
     );
   }
 

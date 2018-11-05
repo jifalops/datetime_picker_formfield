@@ -1,3 +1,7 @@
+## [0.1.6] - November 5, 2018
+
+* Add `editable` option to `TimePickerFormField`.
+
 ## [0.1.5] - November 2, 2018
 
 * Add `editable` option to disable manual editing and always show the picker(s) when the field gains focus.
