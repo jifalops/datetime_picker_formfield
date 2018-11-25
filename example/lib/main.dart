@@ -21,6 +21,7 @@ class MyHomePage extends StatefulWidget {
 class MyHomePageState extends State<MyHomePage> {
   final dateFormat = DateFormat("EEEE, MMMM d, yyyy 'at' h:mma");
   final timeFormat = DateFormat("h:mm a");
+  final controller = TextEditingController();
   DateTime date;
   TimeOfDay time;
   @override
@@ -32,6 +33,7 @@ class MyHomePageState extends State<MyHomePage> {
           children: <Widget>[
             DateTimePickerFormField(
               format: dateFormat,
+              controller: controller,
               decoration: InputDecoration(labelText: 'Date'),
               onChanged: (dt) => setState(() => date = dt),
             ),
@@ -61,6 +63,10 @@ class MyHomePageState extends State<MyHomePage> {
               onChanged: (t) => setState(() => time = t),
             ),
             Text('time.toString(): $time', style: TextStyle(fontSize: 18.0)),
+            SizedBox(height: 16),
+            RaisedButton(
+                onPressed: () => controller.clear(),
+                child: Text('Clear First TextField'))
           ],
         ),
       ));

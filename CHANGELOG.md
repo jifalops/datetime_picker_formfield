@@ -1,3 +1,7 @@
+## [0.1.7] - November 25, 2018
+
+* Fix #11, previous time forgotten when `editable` is false.
+
 ## [0.1.6] - November 5, 2018
 
 * Add `editable` option to `TimePickerFormField`.
