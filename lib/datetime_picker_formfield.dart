@@ -172,7 +172,8 @@ class _DateTimePickerTextFormFieldState extends FormFieldState<DateTime> {
         parent.focusNode.hasFocus;
 
     if (requiresInput) {
-      getDateTimeInput(context, parent.initialDate).then(_setValue);
+      getDateTimeInput(context, parent.initialDate, parent.initialTime)
+          .then(_setValue);
     } else if (parent.resetIcon != null &&
         parent.controller.text.isEmpty == showResetIcon) {
       setState(() => showResetIcon = !showResetIcon);
@@ -182,8 +183,9 @@ class _DateTimePickerTextFormFieldState extends FormFieldState<DateTime> {
     if (!parent.focusNode.hasFocus) {
       setValue(_toDate(_previousValue, parent.format));
     } else if (!requiresInput && !parent.editable) {
-      getDateTimeInput(context,
-              _toDate(_previousValue, parent.format) ?? parent.initialDate)
+      var date = _toDate(_previousValue, parent.format);
+      getDateTimeInput(context, date ?? parent.initialDate,
+              _toTime(date) ?? parent.initialTime)
           .then(_setValue);
     }
   }
@@ -201,7 +203,7 @@ class _DateTimePickerTextFormFieldState extends FormFieldState<DateTime> {
   }
 
   Future<DateTime> getDateTimeInput(
-      BuildContext context, DateTime initialDate) async {
+      BuildContext context, DateTime initialDate, TimeOfDay initialTime) async {
     var date = await showDatePicker(
         context: context,
         firstDate: parent.firstDate,
@@ -216,7 +218,7 @@ class _DateTimePickerTextFormFieldState extends FormFieldState<DateTime> {
       if (!parent.dateOnly) {
         final time = await showTimePicker(
           context: context,
-          initialTime: parent.initialTime ?? TimeOfDay.now(),
+          initialTime: initialTime ?? TimeOfDay.now(),
         );
         if (time != null) {
           date = date.add(Duration(hours: time.hour, minutes: time.minute));
@@ -297,6 +299,12 @@ DateTime _toDate(String string, DateFormat formatter) {
     }
   }
   return null;
+}
+
+/// null-safe version of [TimeOfDay.fromDateTime(time)].
+TimeOfDay _toTime(DateTime date) {
+  if (date == null) return null;
+  return TimeOfDay.fromDateTime(date);
 }
 
 DateTime startOfDay(DateTime date) => DateTime(date.year, date.month, date.day);
