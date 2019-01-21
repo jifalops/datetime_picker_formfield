@@ -226,29 +226,35 @@ class _DateTimePickerTextFormFieldState extends FormFieldState<DateTime> {
 
   Future<DateTime> getDateTimeInput(
       BuildContext context, DateTime initialDate, TimeOfDay initialTime) async {
-    var date = await showDatePicker(
-        context: context,
-        firstDate: widget.firstDate,
-        lastDate: widget.lastDate,
-        initialDate: initialDate,
-        initialDatePickerMode: widget.initialDatePickerMode,
-        locale: widget.locale,
-        selectableDayPredicate: widget.selectableDayPredicate,
-        textDirection: widget.textDirection);
-    if (date != null) {
-      date = startOfDay(date);
-      if (widget.type != PickerType.date) {
-        final time = await showTimePicker(
+    Future<TimeOfDay> getTime() => showTimePicker(
           context: context,
           initialTime: initialTime ?? TimeOfDay.now(),
         );
+
+    if (widget.type != PickerType.time) {
+      var date = await showDatePicker(
+          context: context,
+          firstDate: widget.firstDate,
+          lastDate: widget.lastDate,
+          initialDate: initialDate,
+          initialDatePickerMode: widget.initialDatePickerMode,
+          locale: widget.locale,
+          selectableDayPredicate: widget.selectableDayPredicate,
+          textDirection: widget.textDirection);
+      if (date != null && widget.type == PickerType.both) {
+        final time = await getTime();
         if (time != null) {
-          date = date.add(Duration(hours: time.hour, minutes: time.minute));
+          date =
+              DateTime(date.year, date.month, date.day, time.hour, time.minute);
         }
       }
+      return date;
+    } else {
+      // Get time only
+      final time = await getTime();
+      if (time == null) return null;
+      return DateTime(1, 1, 1, time.hour, time.minute);
     }
-
-    return date;
   }
 
   @override
@@ -346,5 +352,3 @@ TimeOfDay _toTime(DateTime date) {
   if (date == null) return null;
   return TimeOfDay.fromDateTime(date);
 }
-
-DateTime startOfDay(DateTime date) => DateTime(date.year, date.month, date.day);
