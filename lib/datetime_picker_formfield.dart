@@ -3,10 +3,21 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart' show DateFormat;
 import 'package:flutter/services.dart' show TextInputFormatter;
 
+enum PickerType { date, time, both }
+
 /// A [FormField<DateTime>] that uses a [TextField] to manage input.
+///
+/// This widget can use Flutter's date and/or time pickers. The default is to
+/// show both pickers, but can be changed with the [type] parameter.
 class DateTimePickerFormField extends FormField<DateTime> {
+  /// The date/time picker dialogs to show.
+  final PickerType type;
+
+  /// Deprecated. Use [type] instead.
+  ///
   /// Whether to show the time picker after a date has been chosen.
   /// To show the time picker only, use [TimePickerFormField].
+  @deprecated
   final bool dateOnly;
 
   /// Allow manual editing of the date/time. Defaults to true. If false, the
@@ -18,7 +29,9 @@ class DateTimePickerFormField extends FormField<DateTime> {
   /// (Sunday, June 3, 2018 at 9:24pm)
   final DateFormat format;
 
-  /// Where the calendar will start when shown. Defaults to the current date.
+  /// The date the calendar opens to when displayed. Defaults to the current date.
+  ///
+  /// To preset the widget's value, use [initialValue] instead.
   final DateTime initialDate;
 
   /// The earliest choosable date. Defaults to 1900.
@@ -31,7 +44,7 @@ class DateTimePickerFormField extends FormField<DateTime> {
   /// to noon. Explicitly set this to `null` to use the current time.
   final TimeOfDay initialTime;
 
-  /// If defined the TextField [decoration]'s [suffixIcon] will be
+  /// If defined, the TextField [decoration]'s [suffixIcon] will be
   /// overridden to reset the input using the icon defined here.
   /// Set this to `null` to stop that behavior. Defaults to [Icons.close].
   final IconData resetIcon;
@@ -49,6 +62,9 @@ class DateTimePickerFormField extends FormField<DateTime> {
   final DatePickerMode initialDatePickerMode;
 
   /// Corresponds to the [showDatePicker()] parameter.
+  ///
+  /// See [GlobalMaterialLocalizations](https://docs.flutter.io/flutter/flutter_localizations/GlobalMaterialLocalizations-class.html)
+  /// for acceptable values.
   final Locale locale;
 
   /// Corresponds to the [showDatePicker()] parameter.
@@ -67,6 +83,8 @@ class DateTimePickerFormField extends FormField<DateTime> {
   final TextInputType keyboardType;
   final TextStyle style;
   final TextAlign textAlign;
+
+  /// Preset the widget's value.
   final DateTime initialValue;
   final bool autofocus;
   final bool obscureText;
@@ -85,7 +103,8 @@ class DateTimePickerFormField extends FormField<DateTime> {
   DateTimePickerFormField({
     Key key,
     @required this.format,
-    this.dateOnly: false,
+    PickerType type,
+    bool dateOnly,
     this.editable: true,
     this.onChanged,
     this.resetIcon: Icons.close,
@@ -120,6 +139,8 @@ class DateTimePickerFormField extends FormField<DateTime> {
     this.inputFormatters,
   })  : controller = controller ??
             TextEditingController(text: _toString(initialValue, format)),
+        type = type ?? (dateOnly ? PickerType.date : PickerType.both),
+        dateOnly = type == PickerType.date,
         focusNode = focusNode ?? FocusNode(),
         initialDate = initialDate ?? DateTime.now(),
         firstDate = firstDate ?? DateTime(1900),
@@ -130,9 +151,7 @@ class DateTimePickerFormField extends FormField<DateTime> {
             autovalidate: autovalidate,
             validator: validator,
             onSaved: onSaved,
-            builder: (FormFieldState<DateTime> field) {
-              // final _DateTimePickerTextFormFieldState state = field;
-            });
+            builder: (FormFieldState<DateTime> field) {});
 
   @override
   _DateTimePickerTextFormFieldState createState() =>
@@ -170,12 +189,15 @@ class _DateTimePickerTextFormFieldState extends FormFieldState<DateTime> {
   }
 
   void inputChanged() {
-    final bool requiresInput =
-        widget.controller.text.isEmpty && _previousValue.isEmpty && widget.focusNode.hasFocus;
+    final bool requiresInput = widget.controller.text.isEmpty &&
+        _previousValue.isEmpty &&
+        widget.focusNode.hasFocus;
 
     if (requiresInput) {
-      getDateTimeInput(context, widget.initialDate, widget.initialTime).then(_setValue);
-    } else if (widget.resetIcon != null && widget.controller.text.isEmpty == showResetIcon) {
+      getDateTimeInput(context, widget.initialDate, widget.initialTime)
+          .then(_setValue);
+    } else if (widget.resetIcon != null &&
+        widget.controller.text.isEmpty == showResetIcon) {
       setState(() => showResetIcon = !showResetIcon);
       // widget.focusNode.unfocus();
     }
@@ -184,7 +206,8 @@ class _DateTimePickerTextFormFieldState extends FormFieldState<DateTime> {
       setValue(_toDate(_previousValue, widget.format));
     } else if (!requiresInput && !widget.editable) {
       var date = _toDate(_previousValue, widget.format);
-      getDateTimeInput(context, date ?? widget.initialDate, _toTime(date) ?? widget.initialTime)
+      getDateTimeInput(context, date ?? widget.initialDate,
+              _toTime(date) ?? widget.initialTime)
           .then(_setValue);
     }
   }
@@ -214,7 +237,7 @@ class _DateTimePickerTextFormFieldState extends FormFieldState<DateTime> {
         textDirection: widget.textDirection);
     if (date != null) {
       date = startOfDay(date);
-      if (!widget.dateOnly) {
+      if (widget.type != PickerType.date) {
         final time = await showTimePicker(
           context: context,
           initialTime: initialTime ?? TimeOfDay.now(),
@@ -301,18 +324,18 @@ String _toString(DateTime date, DateFormat formatter) {
     try {
       return formatter.format(date);
     } catch (e) {
-      debugPrint('Error formatting date: $e');
+      print('Error formatting date: $e');
     }
   }
   return '';
 }
 
 DateTime _toDate(String string, DateFormat formatter) {
-  if (string != null && string.isNotEmpty) {
+  if (string?.isNotEmpty ?? false) {
     try {
       return formatter.parse(string);
     } catch (e) {
-      debugPrint('Error parsing date: $e');
+      print('Error parsing date: $e');
     }
   }
   return null;
