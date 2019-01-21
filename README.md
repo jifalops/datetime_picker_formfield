@@ -1,12 +1,6 @@
 # Date/Time picker FormFields
 
-Two Flutter widgets that wrap a TextFormField and integrates the date and/or time picker dialogs.
-
-Widget | Description
--|-
-`DateTimePickerFormField` | For using the date picker and optionally the time picker too. Yields `DateTime` values.
-`TimePickerFormField` | For using the time picker only. Yields `TimeOfDay` values.
-
+A widget that wraps a TextFormField and integrates the date and/or time picker dialogs.
 
 ## Example
 
@@ -16,7 +10,6 @@ Widget | Description
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
-import 'package:datetime_picker_formfield/time_picker_formfield.dart';
 
 const appName = 'DateTimePickerFormField Example';
 
@@ -34,10 +27,18 @@ class MyHomePage extends StatefulWidget {
 }
 
 class MyHomePageState extends State<MyHomePage> {
-  final dateFormat = DateFormat("EEEE, MMMM d, yyyy 'at' h:mma");
-  final timeFormat = DateFormat("h:mm a");
+  // Show some different formats.
+  final formats = {
+    InputType.both: DateFormat("EEEE, MMMM d, yyyy 'at' h:mma"),
+    InputType.date: DateFormat('yyyy-MM-dd'),
+    InputType.time: DateFormat("HH:mm"),
+  };
+
+  // Changeable in demo
+  InputType inputType = InputType.both;
+  bool editable = true;
   DateTime date;
-  TimeOfDay time;
+
   @override
   Widget build(BuildContext context) => Scaffold(
       appBar: AppBar(title: Text(appName)),
@@ -45,23 +46,48 @@ class MyHomePageState extends State<MyHomePage> {
         padding: EdgeInsets.all(16.0),
         child: ListView(
           children: <Widget>[
+            Text('Format: "${formats[inputType].pattern}"'),
+
+            //
+            // The widget.
+            //
             DateTimePickerFormField(
-              format: dateFormat,
-              decoration: InputDecoration(labelText: 'Date'),
+              inputType: inputType,
+              format: formats[inputType],
+              editable: editable,
+              decoration: InputDecoration(
+                  labelText: 'Date/Time', hasFloatingPlaceholder: false),
               onChanged: (dt) => setState(() => date = dt),
             ),
+
+            Text('Date value: $date'),
             SizedBox(height: 16.0),
-            TimePickerFormField(
-              format: timeFormat,
-              decoration: InputDecoration(labelText: 'Time'),
-              onChanged: (t) => setState(() => time = t),
+            CheckboxListTile(
+              title: Text('Date picker'),
+              value: inputType != InputType.time,
+              onChanged: (value) => updateInputType(date: value),
             ),
-            SizedBox(height: 16.0),
-            Text('date.toString(): $date', style: TextStyle(fontSize: 18.0)),
-            SizedBox(height: 16.0),
-            Text('time.toString(): $time', style: TextStyle(fontSize: 18.0)),
+            CheckboxListTile(
+              title: Text('Time picker'),
+              value: inputType != InputType.date,
+              onChanged: (value) => updateInputType(time: value),
+            ),
+            CheckboxListTile(
+              title: Text('Editable'),
+              value: editable,
+              onChanged: (value) => setState(() => editable = value),
+            ),
           ],
         ),
       ));
+
+  void updateInputType({bool date, bool time}) {
+    date = date ?? inputType != InputType.time;
+    time = time ?? inputType != InputType.date;
+    setState(() => inputType =
+        date ? time ? InputType.both : InputType.date : InputType.time);
+  }
+}
+
 }
 ```

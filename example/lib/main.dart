@@ -28,7 +28,6 @@ class MyHomePageState extends State<MyHomePage> {
   // Changeable in demo
   InputType inputType = InputType.both;
   bool editable = true;
-  Locale locale = Locale('es');
   DateTime date;
 
   @override
@@ -47,7 +46,6 @@ class MyHomePageState extends State<MyHomePage> {
               inputType: inputType,
               format: formats[inputType],
               editable: editable,
-              locale: locale,
               decoration: InputDecoration(
                   labelText: 'Date/Time', hasFloatingPlaceholder: false),
               onChanged: (dt) => setState(() => date = dt),

@@ -1,3 +1,9 @@
+## [0.1.8] - January 21, 2019
+
+* Remove state reference to widget (#22)
+* Allow DateTimePickerFormField to use time-only.
+* Deprecate TimePickerFormField.
+
 ## [0.1.7] - November 25, 2018
 
 * Fix #11, previous time forgotten when `editable` is false.
