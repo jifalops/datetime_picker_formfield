@@ -21,8 +21,11 @@ DateFormat toDateFormat(TimeOfDayFormat format) {
   return null;
 }
 
+/// Deprecated. Use [DateTimePickerFormField] with `type = PickerType.time`
+/// instead.
 /// A [FormField<TimeOfDay>] that uses a [TextField] to manage input.
 /// If it gains focus while empty, the time picker will be shown to the user.
+@deprecated
 class TimePickerFormField extends FormField<TimeOfDay> {
   /// For representing the time as a string e.g.
   /// `DateFormat("h:mma")` (9:24pm). You can also use the helper function
