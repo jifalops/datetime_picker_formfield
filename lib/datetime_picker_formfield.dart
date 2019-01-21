@@ -3,17 +3,17 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart' show DateFormat;
 import 'package:flutter/services.dart' show TextInputFormatter;
 
-enum PickerType { date, time, both }
+enum InputType { date, time, both }
 
 /// A [FormField<DateTime>] that uses a [TextField] to manage input.
 ///
 /// This widget can use Flutter's date and/or time pickers. The default is to
-/// show both pickers, but can be changed with the [type] parameter.
+/// show both pickers, but can be changed with the [inputType] parameter.
 class DateTimePickerFormField extends FormField<DateTime> {
   /// The date/time picker dialogs to show.
-  final PickerType type;
+  final InputType inputType;
 
-  /// Deprecated. Use [type] instead.
+  /// Deprecated. Use [inputType] instead.
   ///
   /// Whether to show the time picker after a date has been chosen.
   /// To show the time picker only, use [TimePickerFormField].
@@ -103,7 +103,7 @@ class DateTimePickerFormField extends FormField<DateTime> {
   DateTimePickerFormField({
     Key key,
     @required this.format,
-    PickerType type,
+    InputType inputType,
     bool dateOnly,
     this.editable: true,
     this.onChanged,
@@ -139,8 +139,8 @@ class DateTimePickerFormField extends FormField<DateTime> {
     this.inputFormatters,
   })  : controller = controller ??
             TextEditingController(text: _toString(initialValue, format)),
-        type = type ?? (dateOnly ? PickerType.date : PickerType.both),
-        dateOnly = type == PickerType.date,
+        inputType = inputType ?? (dateOnly ? InputType.date : InputType.both),
+        dateOnly = inputType == InputType.date,
         focusNode = focusNode ?? FocusNode(),
         initialDate = initialDate ?? DateTime.now(),
         firstDate = firstDate ?? DateTime(1900),
@@ -231,7 +231,7 @@ class _DateTimePickerTextFormFieldState extends FormFieldState<DateTime> {
           initialTime: initialTime ?? TimeOfDay.now(),
         );
 
-    if (widget.type != PickerType.time) {
+    if (widget.inputType != InputType.time) {
       var date = await showDatePicker(
           context: context,
           firstDate: widget.firstDate,
@@ -241,11 +241,14 @@ class _DateTimePickerTextFormFieldState extends FormFieldState<DateTime> {
           locale: widget.locale,
           selectableDayPredicate: widget.selectableDayPredicate,
           textDirection: widget.textDirection);
-      if (date != null && widget.type == PickerType.both) {
-        final time = await getTime();
-        if (time != null) {
-          date =
-              DateTime(date.year, date.month, date.day, time.hour, time.minute);
+      if (date != null) {
+        date = DateTime(date.year, date.month, date.day);
+        if (widget.inputType == InputType.both) {
+          final time = await getTime();
+          if (time != null) {
+            date = DateTime(
+                date.year, date.month, date.day, time.hour, time.minute);
+          }
         }
       }
       return date;
@@ -310,17 +313,24 @@ class _DateTimePickerTextFormFieldState extends FormFieldState<DateTime> {
   void didUpdateWidget(DateTimePickerFormField oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.controller != oldWidget.controller) {
-      oldWidget.controller?.removeListener(inputChanged);
-      widget.controller?.addListener(inputChanged);
+      print('controller changed');
+      oldWidget.controller.removeListener(inputChanged);
+      widget.controller.text = oldWidget.controller.text;
+      widget.controller.selection = oldWidget.controller.selection;
+      widget.controller.addListener(inputChanged);
     }
     if (widget.focusNode != oldWidget.focusNode) {
-      oldWidget.focusNode?.removeListener(inputChanged);
-      widget.focusNode?.addListener(inputChanged);
+      print('focusnode changed');
+      oldWidget.focusNode.removeListener(inputChanged);
+      widget.focusNode.addListener(inputChanged);
     }
 
     // Update text value if format is changed
     if (widget.format != oldWidget.format) {
+      print('format changed');
+      widget.controller.removeListener(inputChanged);
       widget.controller.text = _toString(value, widget.format);
+      widget.controller.addListener(inputChanged);
     }
   }
 }

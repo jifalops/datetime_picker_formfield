@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
-import 'package:datetime_picker_formfield/time_picker_formfield.dart';
 
 const appName = 'DateTimePickerFormField Example';
 
@@ -19,11 +18,19 @@ class MyHomePage extends StatefulWidget {
 }
 
 class MyHomePageState extends State<MyHomePage> {
-  final dateFormat = DateFormat("EEEE, MMMM d, yyyy 'at' h:mma");
-  final timeFormat = DateFormat("h:mm a");
-  final controller = TextEditingController();
+  // Show some different formats.
+  final formats = {
+    InputType.both: DateFormat("EEEE, MMMM d, yyyy 'at' h:mma"),
+    InputType.date: DateFormat('yyyy-MM-dd'),
+    InputType.time: DateFormat("HH:mm"),
+  };
+
+  // Changeable in demo
+  InputType inputType = InputType.both;
+  bool editable = true;
+  Locale locale = Locale('es');
   DateTime date;
-  TimeOfDay time;
+
   @override
   Widget build(BuildContext context) => Scaffold(
       appBar: AppBar(title: Text(appName)),
@@ -31,43 +38,46 @@ class MyHomePageState extends State<MyHomePage> {
         padding: EdgeInsets.all(16.0),
         child: ListView(
           children: <Widget>[
+            Text('Format: "${formats[inputType].pattern}"'),
+
+            //
+            // The widget.
+            //
             DateTimePickerFormField(
-              format: dateFormat,
-              controller: controller,
-              decoration: InputDecoration(labelText: 'Date'),
+              inputType: inputType,
+              format: formats[inputType],
+              editable: editable,
+              locale: locale,
+              decoration: InputDecoration(
+                  labelText: 'Date/Time', hasFloatingPlaceholder: false),
               onChanged: (dt) => setState(() => date = dt),
             ),
-            Text('date.toString(): $date', style: TextStyle(fontSize: 18.0)),
+
+            Text('Date value: $date'),
             SizedBox(height: 16.0),
-            TimePickerFormField(
-              format: timeFormat,
-              decoration: InputDecoration(labelText: 'Time'),
-              onChanged: (t) => setState(() => time = t),
+            CheckboxListTile(
+              title: Text('Date picker'),
+              value: inputType != InputType.time,
+              onChanged: (value) => updateInputType(date: value),
             ),
-            Text('time.toString(): $time', style: TextStyle(fontSize: 18.0)),
-            Padding(
-                padding: EdgeInsets.symmetric(vertical: 16.0),
-                child: Text("Non-Editable")),
-            DateTimePickerFormField(
-              editable: false,
-              format: dateFormat,
-              decoration: InputDecoration(labelText: 'Date'),
-              onChanged: (dt) => setState(() => date = dt),
+            CheckboxListTile(
+              title: Text('Time picker'),
+              value: inputType != InputType.date,
+              onChanged: (value) => updateInputType(time: value),
             ),
-            Text('date.toString(): $date', style: TextStyle(fontSize: 18.0)),
-            SizedBox(height: 16.0),
-            TimePickerFormField(
-              editable: false,
-              format: timeFormat,
-              decoration: InputDecoration(labelText: 'Time'),
-              onChanged: (t) => setState(() => time = t),
+            CheckboxListTile(
+              title: Text('Editable'),
+              value: editable,
+              onChanged: (value) => setState(() => editable = value),
             ),
-            Text('time.toString(): $time', style: TextStyle(fontSize: 18.0)),
-            SizedBox(height: 16),
-            RaisedButton(
-                onPressed: () => controller.clear(),
-                child: Text('Clear First TextField'))
           ],
         ),
       ));
+
+  void updateInputType({bool date, bool time}) {
+    date = date ?? inputType != InputType.time;
+    time = time ?? inputType != InputType.date;
+    setState(() => inputType =
+        date ? time ? InputType.both : InputType.date : InputType.time);
+  }
 }
