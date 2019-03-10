@@ -100,6 +100,11 @@ class DateTimePickerFormField extends FormField<DateTime> {
   /// changes, use the [controller] and [focusNode].
   final ValueChanged<DateTime> onChanged;
 
+  /// The [builder] parameter can be used to wrap the dialog widget
+  /// to add inherited widgets like [Localizations.override],
+  /// [Directionality], or [MediaQuery].
+  final TransitionBuilder datePickerBuilder;
+
   DateTimePickerFormField({
     Key key,
     @required this.format,
@@ -120,6 +125,7 @@ class DateTimePickerFormField extends FormField<DateTime> {
     this.locale,
     this.selectableDayPredicate,
     this.textDirection,
+    this.datePickerBuilder,
 
     // TextField properties
     TextEditingController controller,
@@ -240,7 +246,8 @@ class _DateTimePickerTextFormFieldState extends FormFieldState<DateTime> {
           initialDatePickerMode: widget.initialDatePickerMode,
           locale: widget.locale,
           selectableDayPredicate: widget.selectableDayPredicate,
-          textDirection: widget.textDirection);
+          textDirection: widget.textDirection,
+          builder: widget.datePickerBuilder);
       if (date != null) {
         date = DateTime(date.year, date.month, date.day);
         if (widget.inputType == InputType.both) {
