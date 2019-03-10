@@ -234,6 +234,7 @@ class _DateTimePickerTextFormFieldState extends FormFieldState<DateTime> {
       BuildContext context, DateTime initialDate, TimeOfDay initialTime) async {
     Future<TimeOfDay> getTime() => showTimePicker(
           context: context,
+          builder: widget.datePickerBuilder,
           initialTime: initialTime ?? TimeOfDay.now(),
         );
 
