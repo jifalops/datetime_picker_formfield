@@ -104,7 +104,7 @@ class DateTimePickerFormField extends FormField<DateTime> {
     Key key,
     @required this.format,
     InputType inputType,
-    bool dateOnly,
+    bool dateOnly: false,
     this.editable: true,
     this.onChanged,
     this.resetIcon: Icons.close,
