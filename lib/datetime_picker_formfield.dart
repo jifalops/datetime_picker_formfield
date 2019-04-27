@@ -234,7 +234,7 @@ class _DateTimePickerTextFormFieldState extends FormFieldState<DateTime> {
     if (MediaQuery.of(context).viewInsets.bottom > 0) {
       FocusScope.of(context).requestFocus(new FocusNode());
       // add a delay just to be sure that keyboard is no longer visible
-      await Future.delayed(Duration(milliseconds: 100));
+      await Future.delayed(Duration(milliseconds: 300));
     }
 
     if (widget.inputType != InputType.time) {
