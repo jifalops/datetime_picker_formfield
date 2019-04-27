@@ -231,6 +231,12 @@ class _DateTimePickerTextFormFieldState extends FormFieldState<DateTime> {
           initialTime: initialTime ?? TimeOfDay.now(),
         );
 
+    if (MediaQuery.of(context).viewInsets.bottom > 0) {
+      FocusScope.of(context).requestFocus(new FocusNode());
+      // add a delay just to be sure that keyboard is no longer visible
+      await Future.delayed(Duration(milliseconds: 100));
+    }
+
     if (widget.inputType != InputType.time) {
       var date = await showDatePicker(
           context: context,
@@ -313,21 +319,18 @@ class _DateTimePickerTextFormFieldState extends FormFieldState<DateTime> {
   void didUpdateWidget(DateTimePickerFormField oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.controller != oldWidget.controller) {
-      print('controller changed');
       oldWidget.controller.removeListener(inputChanged);
       widget.controller.text = oldWidget.controller.text;
       widget.controller.selection = oldWidget.controller.selection;
       widget.controller.addListener(inputChanged);
     }
     if (widget.focusNode != oldWidget.focusNode) {
-      print('focusnode changed');
       oldWidget.focusNode.removeListener(inputChanged);
       widget.focusNode.addListener(inputChanged);
     }
 
     // Update text value if format is changed
     if (widget.format != oldWidget.format) {
-      print('format changed');
       widget.controller.removeListener(inputChanged);
       widget.controller.text = _toString(value, widget.format);
       widget.controller.addListener(inputChanged);
