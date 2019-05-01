@@ -142,9 +142,10 @@ class DateTimePickerFormField extends FormField<DateTime> {
         inputType = inputType ?? (dateOnly ? InputType.date : InputType.both),
         dateOnly = inputType == InputType.date,
         focusNode = focusNode ?? FocusNode(),
-        initialDate = initialDate ?? DateTime.now(),
-        firstDate = firstDate ?? DateTime(1900),
-        lastDate = lastDate ?? DateTime(2100),
+        initialDate =
+            initialDate ?? lastDate ?? DateTime(DateTime.now().year + 100),
+        firstDate = firstDate ?? DateTime(DateTime.now().year - 100),
+        lastDate = lastDate ?? DateTime(DateTime.now().year + 100),
         initialDatePickerMode = initialDatePickerMode ?? DatePickerMode.day,
         super(
             key: key,
