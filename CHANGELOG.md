@@ -1,3 +1,10 @@
+## [0.2.0] - May 29, 2019
+
+* Add [datePicker] and [timePicker] callback functions to enable full control of the system dialogs (material vs cupertino, language, theme, etc.)
+* Remove deprecated [dateOnly] and [TimePickerFormField]
+* Remove accidental log messages
+* Add [builder] param for localization and theming
+
 ## [0.1.8] - January 21, 2019
 
 * Remove state reference to widget (#22)
