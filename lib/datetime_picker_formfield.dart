@@ -13,13 +13,6 @@ class DateTimePickerFormField extends FormField<DateTime> {
   /// The date/time picker dialogs to show.
   final InputType inputType;
 
-  /// Deprecated. Use [inputType] instead.
-  ///
-  /// Whether to show the time picker after a date has been chosen.
-  /// To show the time picker only, use [TimePickerFormField].
-  @deprecated
-  final bool dateOnly;
-
   /// Allow manual editing of the date/time. Defaults to true. If false, the
   /// picker(s) will be shown every time the field gains focus.
   final bool editable;
@@ -103,8 +96,7 @@ class DateTimePickerFormField extends FormField<DateTime> {
   DateTimePickerFormField({
     Key key,
     @required this.format,
-    InputType inputType,
-    bool dateOnly: false,
+    this.inputType = InputType.both,
     this.editable: true,
     this.onChanged,
     this.resetIcon: Icons.close,
@@ -139,8 +131,6 @@ class DateTimePickerFormField extends FormField<DateTime> {
     this.inputFormatters,
   })  : controller = controller ??
             TextEditingController(text: _toString(initialValue, format)),
-        inputType = inputType ?? (dateOnly ? InputType.date : InputType.both),
-        dateOnly = inputType == InputType.date,
         focusNode = focusNode ?? FocusNode(),
         initialDate = initialDate ?? DateTime.now(),
         firstDate = firstDate ?? DateTime(1900),
@@ -364,4 +354,23 @@ DateTime _toDate(String string, DateFormat formatter) {
 TimeOfDay _toTime(DateTime date) {
   if (date == null) return null;
   return TimeOfDay.fromDateTime(date);
+}
+
+DateFormat toDateFormat(TimeOfDayFormat format) {
+  switch (format) {
+    case TimeOfDayFormat.a_space_h_colon_mm:
+      return DateFormat('a h:mm');
+    case TimeOfDayFormat.frenchCanadian:
+      return DateFormat("HH 'h' mm");
+    case TimeOfDayFormat.H_colon_mm:
+      return DateFormat('H:mm');
+    case TimeOfDayFormat.h_colon_mm_space_a:
+      return DateFormat('h:mm a');
+    case TimeOfDayFormat.HH_colon_mm:
+      return DateFormat('HH:mm');
+    case TimeOfDayFormat.HH_dot_mm:
+      return DateFormat('HH.mm');
+    default:
+      return null;
+  }
 }
