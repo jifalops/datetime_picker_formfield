@@ -94,48 +94,49 @@ class DateTimePickerFormField extends FormField<DateTime> {
   final ValueChanged<DateTime> onChanged;
 
   /// The [builder] parameter can be used to wrap the dialog widget
-  /// to add inherited widgets like [Localizations.override],
+  /// to add inherited widgets like a [Theme], [Localizations.override],
   /// [Directionality], or [MediaQuery].
-  final TransitionBuilder datePickerBuilder;
+  final TransitionBuilder widgetBuilder;
 
   DateTimePickerFormField({
     Key key,
     @required this.format,
     this.inputType = InputType.both,
-    this.editable: true,
+    this.editable = true,
     this.onChanged,
-    this.resetIcon: Icons.close,
+    this.resetIcon = Icons.close,
     DateTime initialDate,
     DateTime firstDate,
     DateTime lastDate,
-    this.initialTime: const TimeOfDay(hour: 12, minute: 0),
+    this.initialTime = const TimeOfDay(hour: 12, minute: 0),
     this.validator,
     this.onSaved,
     this.onFieldSubmitted,
-    bool autovalidate: false,
+    bool autovalidate = false,
     DatePickerMode initialDatePickerMode,
     this.locale,
     this.selectableDayPredicate,
     this.textDirection,
-    this.datePickerBuilder,
+    TransitionBuilder builder,
 
     // TextField properties
     TextEditingController controller,
     FocusNode focusNode,
     this.initialValue,
-    this.decoration: const InputDecoration(),
-    this.keyboardType: TextInputType.text,
+    this.decoration = const InputDecoration(),
+    this.keyboardType = TextInputType.text,
     this.style,
-    this.textAlign: TextAlign.start,
-    this.autofocus: false,
-    this.obscureText: false,
-    this.autocorrect: true,
-    this.maxLengthEnforced: true,
+    this.textAlign = TextAlign.start,
+    this.autofocus = false,
+    this.obscureText = false,
+    this.autocorrect = true,
+    this.maxLengthEnforced = true,
     this.enabled,
-    this.maxLines: 1,
+    this.maxLines = 1,
     this.maxLength,
     this.inputFormatters,
-  })  : controller = controller ??
+  })  : widgetBuilder = builder,
+        controller = controller ??
             TextEditingController(text: _toString(initialValue, format)),
         focusNode = focusNode ?? FocusNode(),
         initialDate = initialDate ?? DateTime.now(),
@@ -224,7 +225,7 @@ class _DateTimePickerTextFormFieldState extends FormFieldState<DateTime> {
       BuildContext context, DateTime initialDate, TimeOfDay initialTime) async {
     Future<TimeOfDay> getTime() => showTimePicker(
           context: context,
-          builder: widget.datePickerBuilder,
+          builder: widget.widgetBuilder,
           initialTime: initialTime ?? TimeOfDay.now(),
         );
 
@@ -244,7 +245,7 @@ class _DateTimePickerTextFormFieldState extends FormFieldState<DateTime> {
           locale: widget.locale,
           selectableDayPredicate: widget.selectableDayPredicate,
           textDirection: widget.textDirection,
-          builder: widget.datePickerBuilder);
+          builder: widget.widgetBuilder);
       if (date != null) {
         date = DateTime(date.year, date.month, date.day);
         if (widget.inputType == InputType.both) {
