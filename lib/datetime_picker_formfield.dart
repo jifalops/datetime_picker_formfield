@@ -333,6 +333,7 @@ class _DateTimePickerTextFormFieldState extends FormFieldState<DateTime> {
           return widget.onSaved(_toDate(value, widget.format));
         }
       },
+      readOnly: widget.editable == false,
     );
   }
 
