@@ -75,18 +75,18 @@ class _DateTimeFormState extends State<DateTimeForm> {
           SizedBox(height: 24),
           ComplexDateTimeField(),
           SizedBox(height: 24),
-          RaisedButton(
-            child: Text('Save'),
-            onPressed: () => formKey.currentState.save(),
-          ),
-          RaisedButton(
-            child: Text('Reset'),
-            onPressed: () => formKey.currentState.reset(),
-          ),
-          RaisedButton(
-            child: Text('Validate'),
-            onPressed: () => formKey.currentState.validate(),
-          ),
+          // RaisedButton(
+          //   child: Text('Save'),
+          //   onPressed: () => formKey.currentState.save(),
+          // ),
+          // RaisedButton(
+          //   child: Text('Reset'),
+          //   onPressed: () => formKey.currentState.reset(),
+          // ),
+          // RaisedButton(
+          //   child: Text('Validate'),
+          //   onPressed: () => formKey.currentState.validate(),
+          // ),
         ],
       ),
     );
@@ -214,7 +214,6 @@ class _ComplexDateTimeFieldState extends State<ComplexDateTimeField> {
 
   @override
   Widget build(BuildContext context) {
-    print(autoValidate);
     return Column(children: <Widget>[
       Text('Complex date & time field (${format.pattern})'),
       DateTimeField(
@@ -248,9 +247,11 @@ class _ComplexDateTimeFieldState extends State<ComplexDateTimeField> {
           savedCount++;
         }),
         resetIcon: showResetIcon ? Icon(Icons.delete) : null,
-        readOnly: readOnly,
-        decoration: InputDecoration(
-            helperText: 'Changed: $changedCount, Saved: $savedCount, $value'),
+        child: TextField(
+          readOnly: readOnly,
+          decoration: InputDecoration(
+              helperText: 'Changed: $changedCount, Saved: $savedCount, $value'),
+        ),
       ),
       CheckboxListTile(
         title: Text('autoValidate'),
