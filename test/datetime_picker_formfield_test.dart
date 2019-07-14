@@ -7,10 +7,10 @@ void main() {
   final dateFormat = DateFormat("EEEE, MMMM d, yyyy 'at' h:mma");
   final timeFormat = toDateFormat(TimeOfDayFormat.HH_colon_mm);
   test('Constructs minimal instances', () {
-    final dateField = DateTimePickerFormField(
+    final dateField = DateTimeTextField(
       format: dateFormat,
     );
-    final timeField = DateTimePickerFormField(
+    final timeField = DateTimeTextField(
       format: timeFormat,
     );
     // expect(calculator.addOne(2), 3);
