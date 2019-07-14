@@ -7,12 +7,11 @@ homepage: https://github.com/jifalops/datetime_picker_formfield
 dependencies:
   flutter:
     sdk: flutter
-  intl: ^0.15.0
-
+  intl: ^0.15.8
 dev_dependencies:
   flutter_test:
     sdk: flutter
 
 environment:
   sdk: ">=2.0.0 <3.0.0"
-  flutter: ">=0.1.2 <2.0.0"
+  flutter: ">=1.0.0 <2.0.0"

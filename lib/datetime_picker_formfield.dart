@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart' show DateFormat;
 import 'package:flutter/services.dart' show TextInputFormatter;
@@ -9,37 +8,76 @@ class DateTimeField extends FormField<DateTime> {
   DateTimeField({
     @required this.format,
     @required this.onShowPicker,
-    this.child = const TextField(),
 
     // From super
     Key key,
     FormFieldSetter<DateTime> onSaved,
     FormFieldValidator<DateTime> validator,
     DateTime initialValue,
-    bool autovalidate = false,
+    // bool autovalidate = false,
     // bool enabled = true,
 
     // Features
     TransitionBuilder builder,
     this.resetIcon = const Icon(Icons.close),
     this.onChanged,
-  })  : widgetBuilder = builder,
+
+    // From [TextFormField]
+    // this.key,
+    TextEditingController controller,
+    // this.initialValue,
+    FocusNode focusNode,
+    this.decoration = const InputDecoration(),
+    this.keyboardType,
+    this.textCapitalization = TextCapitalization.none,
+    this.textInputAction,
+    this.style,
+    this.strutStyle,
+    this.textDirection,
+    this.textAlign = TextAlign.start,
+    this.autofocus = false,
+    this.readOnly = false,
+    this.showCursor,
+    this.obscureText = false,
+    this.autocorrect = true,
+    this.autovalidate = false,
+    this.maxLengthEnforced = true,
+    this.maxLines = 1,
+    this.minLines,
+    this.expands = false,
+    this.maxLength,
+    // this.onChanged,
+    this.onEditingComplete,
+    this.onFieldSubmitted,
+    // this.onSaved,
+    // this.validator,
+    this.inputFormatters,
+    this.enabled = true,
+    this.cursorWidth = 2.0,
+    this.cursorRadius,
+    this.cursorColor,
+    this.keyboardAppearance,
+    this.scrollPadding = const EdgeInsets.all(20.0),
+    this.enableInteractiveSelection = true,
+    this.buildCounter,
+  })  : controller = controller ?? TextEditingController(),
+        focusNode = focusNode ?? FocusNode(),
+        widgetBuilder = builder,
         super(
             key: key,
             autovalidate: autovalidate,
             initialValue: initialValue,
-            enabled: child.enabled,
+            enabled: enabled,
             validator: validator,
             onSaved: onSaved,
-            builder: (state) => Container());
+            builder: (state) => Container()) {
+    this.controller.text = DateTimeField.tryFormat(initialValue, format);
+  }
 
   /// For representing the date as a string e.g.
   /// `DateFormat("EEEE, MMMM d, yyyy 'at' h:mma")`
   /// (Sunday, June 3, 2018 at 9:24pm)
   final DateFormat format;
-
-  /// The text field to manage. One will be created if not provided.
-  final TextField child;
 
   /// Called when the date chooser dialog should be shown.
   final Future<DateTime> Function(BuildContext context, DateTime currentValue)
@@ -91,20 +129,57 @@ class DateTimeField extends FormField<DateTime> {
 
   static DateTime convert(TimeOfDay time) =>
       DateTime(1, 1, 1, time?.hour ?? 0, time?.minute ?? 0);
+
+  // From [TextformField]
+  // final Key key;
+  final TextEditingController controller;
+  // final String initialValue;
+  final FocusNode focusNode;
+  final InputDecoration decoration;
+  final TextInputType keyboardType;
+  final TextCapitalization textCapitalization;
+  final TextInputAction textInputAction;
+  final TextStyle style;
+  final StrutStyle strutStyle;
+  final TextDirection textDirection;
+  final TextAlign textAlign;
+  final bool autofocus;
+  final bool readOnly;
+  final bool showCursor;
+  final bool obscureText;
+  final bool autocorrect;
+  final bool autovalidate;
+  final bool maxLengthEnforced;
+  final int maxLines;
+  final int minLines;
+  final bool expands;
+  final int maxLength;
+  // final ValueChanged<String> onChanged;
+  final VoidCallback onEditingComplete;
+  final ValueChanged<String> onFieldSubmitted;
+  // final FormFieldSetter<String> onSaved;
+  // final FormFieldValidator<String> validator;
+  final List<TextInputFormatter> inputFormatters;
+  final bool enabled;
+  final double cursorWidth;
+  final Radius cursorRadius;
+  final Color cursorColor;
+  final Brightness keyboardAppearance;
+  final EdgeInsets scrollPadding;
+  final bool enableInteractiveSelection;
+  final InputCounterWidgetBuilder buildCounter;
 }
 
 class _DateTimeFieldState extends FormFieldState<DateTime> {
-  TextEditingController controller;
-  FocusNode focusNode;
   bool showResetIcon = false;
   bool isShowingDialog = false;
   bool hadFocus;
   bool hadText;
 
-  /// true when updating the text after a change in value
+  /// `true` when updating the text after programmatically changing the value
   bool changingText = false;
 
-  /// true when changing the value internally and
+  /// `true` when updating the value after programmatically changing the text
   bool changingValue = false;
 
   /// The most recent non-null value;
@@ -112,6 +187,9 @@ class _DateTimeFieldState extends FormFieldState<DateTime> {
 
   @override
   DateTimeField get widget => super.widget;
+
+  TextEditingController get controller => widget.controller;
+  FocusNode get focusNode => widget.focusNode;
 
   bool get hasFocus => focusNode.hasFocus;
   bool get hasText => controller.text.isNotEmpty;
@@ -125,9 +203,7 @@ class _DateTimeFieldState extends FormFieldState<DateTime> {
     if (value != null) {
       lastValidValue = value;
     }
-    controller = widget.child.controller ?? TextEditingController();
     controller.text = format(widget.initialValue);
-    focusNode = widget.child.focusNode ?? FocusNode();
     hadFocus = focusNode.hasFocus;
     hadText = controller.text.isNotEmpty;
     focusNode.addListener(focusChanged);
@@ -136,12 +212,12 @@ class _DateTimeFieldState extends FormFieldState<DateTime> {
 
   @override
   void dispose() {
-    if (controller != widget.child.controller) {
+    if (controller != widget.controller) {
       controller.dispose();
     } else {
       controller.removeListener(textChanged);
     }
-    if (focusNode != widget.child.focusNode) {
+    if (focusNode != widget.focusNode) {
       focusNode.dispose();
     } else {
       focusNode.removeListener(focusChanged);
@@ -183,7 +259,7 @@ class _DateTimeFieldState extends FormFieldState<DateTime> {
   }
 
   void focusChanged() {
-    if (hasFocus && !hadFocus && (!hasText || widget.child.readOnly)) {
+    if (hasFocus && !hadFocus && (!hasText || widget.readOnly)) {
       requestUpdate();
     } else if (hadFocus && !hasFocus) {}
 
@@ -193,7 +269,7 @@ class _DateTimeFieldState extends FormFieldState<DateTime> {
   void textChanged() {
     if (showResetIcon != hasText &&
         widget.resetIcon != null &&
-        widget.child.decoration.suffixIcon == null) {
+        widget.decoration.suffixIcon == null) {
       setState(() => showResetIcon = !showResetIcon);
     }
     if (!changingText) {
@@ -230,14 +306,14 @@ class _DateTimeFieldState extends FormFieldState<DateTime> {
 
   @override
   Widget build(BuildContext context) {
-    return TextField(
+    return TextFormField(
       // Key key,
-      controller: controller,
-      focusNode: focusNode,
+      controller: widget.controller,
+      focusNode: widget.focusNode,
       decoration:
-          widget.resetIcon == null || widget.child.decoration.suffixIcon != null
-              ? widget.child.decoration
-              : widget.child.decoration.copyWith(
+          widget.resetIcon == null || widget.decoration.suffixIcon != null
+              ? widget.decoration
+              : widget.decoration.copyWith(
                   suffixIcon: showResetIcon
                       ? IconButton(
                           icon: widget.resetIcon,
@@ -248,40 +324,62 @@ class _DateTimeFieldState extends FormFieldState<DateTime> {
                         )
                       : Container(width: 0, height: 0),
                 ),
-      keyboardType: widget.child.keyboardType,
-      textInputAction: widget.child.textInputAction,
-      textCapitalization: widget.child.textCapitalization,
-      style: widget.child.style,
-      strutStyle: widget.child.strutStyle,
-      textAlign: widget.child.textAlign,
-      textAlignVertical: widget.child.textAlignVertical,
-      textDirection: widget.child.textDirection,
-      readOnly: widget.child.readOnly,
-      showCursor: widget.child.showCursor,
-      autofocus: widget.child.autofocus,
-      obscureText: widget.child.obscureText,
-      autocorrect: widget.child.autocorrect,
-      maxLines: widget.child.maxLines,
-      minLines: widget.child.minLines,
-      expands: widget.child.expands,
-      maxLength: widget.child.maxLength,
-      maxLengthEnforced: widget.child.maxLengthEnforced,
-      onChanged: widget.child.onChanged,
-      onEditingComplete: widget.child.onEditingComplete,
-      onSubmitted: widget.child.onSubmitted,
-      inputFormatters: widget.child.inputFormatters,
-      enabled: widget.child.enabled,
-      cursorWidth: widget.child.cursorWidth,
-      cursorRadius: widget.child.cursorRadius,
-      cursorColor: widget.child.cursorColor,
-      keyboardAppearance: widget.child.keyboardAppearance,
-      scrollPadding: widget.child.scrollPadding,
-      dragStartBehavior: widget.child.dragStartBehavior,
-      enableInteractiveSelection: widget.child.enableInteractiveSelection,
-      onTap: widget.child.onTap,
-      buildCounter: widget.child.buildCounter,
-      scrollController: widget.child.scrollController,
-      scrollPhysics: widget.child.scrollPhysics,
+      // initialValue: format(widget.initialValue),
+      keyboardType: widget.keyboardType,
+      textCapitalization: widget.textCapitalization,
+      textInputAction: widget.textInputAction,
+      style: widget.style,
+      strutStyle: widget.strutStyle,
+      textDirection: widget.textDirection,
+      textAlign: widget.textAlign,
+      // autofocus: widget.autofocus,
+      readOnly: widget.readOnly,
+      // showCursor: widget.showCursor,
+      // obscureText: widget.obscureText,
+      // autocorrect: widget.autocorrect,
+      autovalidate: widget.autovalidate,
+      // maxLengthEnforced: widget.maxLengthEnforced,
+      maxLines: widget.maxLines,
+      minLines: widget.minLines,
+      // expands: widget.expands,
+      maxLength: widget.maxLength,
+      onEditingComplete: widget.onEditingComplete,
+      // onFieldSubmitted: widget.onFieldSubmitted,
+      onSaved: (string) => widget.onSaved(parse(string)),
+      validator: (string) => widget.validator(parse(string)),
+      inputFormatters: widget.inputFormatters,
+      enabled: widget.enabled ?? true,
+      cursorWidth: widget.cursorWidth,
+      cursorRadius: widget.cursorRadius,
+      cursorColor: widget.cursorColor,
+      keyboardAppearance: widget.keyboardAppearance,
+      scrollPadding: widget.scrollPadding,
+      enableInteractiveSelection: widget.enableInteractiveSelection ?? true,
+      buildCounter: widget.buildCounter,
     );
+  }
+
+  @override
+  void didUpdateWidget(DateTimeField oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.controller != oldWidget.controller) {
+      oldWidget.controller.removeListener(textChanged);
+      widget.controller.text = oldWidget.controller.text;
+      widget.controller.selection = oldWidget.controller.selection;
+      widget.controller.addListener(textChanged);
+      // oldWidget.controller.dispose();
+    }
+    if (widget.focusNode != oldWidget.focusNode) {
+      oldWidget.focusNode.removeListener(focusChanged);
+      widget.focusNode.addListener(focusChanged);
+      // oldWidget.focusNode.dispose();
+    }
+
+    // Update text value if format is changed
+    if (widget.format != oldWidget.format) {
+      widget.controller.removeListener(textChanged);
+      widget.controller.text = format(value);
+      widget.controller.addListener(textChanged);
+    }
   }
 }

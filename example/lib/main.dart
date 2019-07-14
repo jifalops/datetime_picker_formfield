@@ -20,41 +20,55 @@ class MyHomePage extends StatefulWidget {
 }
 
 class MyHomePageState extends State<MyHomePage> {
-  final formKey = GlobalKey<FormState>();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(appName)),
-      body: Form(
-        key: formKey,autovalidate: true,
-        child: ListView(
-          padding: EdgeInsets.all(8),
+        appBar: AppBar(title: Text(appName)),
+        body: ListView(
+          padding: EdgeInsets.all(16),
           children: <Widget>[
-            BasicDateField(),
-            SizedBox(height: 8),
-            BasicTimeField(),
-            SizedBox(height: 8),
-            BasicDateTimeField(),
-            SizedBox(height: 8),
-            IosStylePickers(),
-            SizedBox(height: 8),
-            ComplexDateTimeField(),
-            SizedBox(height: 8),
-            RaisedButton(
-              child: Text('Save'),
-              onPressed: () => formKey.currentState.save(),
-            ),
-            RaisedButton(
-              child: Text('Reset'),
-              onPressed: () => formKey.currentState.reset(),
-            ),
-            RaisedButton(
-              child: Text('Validate'),
-              onPressed: () =>
-                  print('Valid: ${formKey.currentState.validate()}'),
-            ),
+            DateTimeForm(),
           ],
-        ),
+        ));
+  }
+}
+
+class DateTimeForm extends StatefulWidget {
+  @override
+  _DateTimeFormState createState() => _DateTimeFormState();
+}
+
+class _DateTimeFormState extends State<DateTimeForm> {
+  final formKey = GlobalKey<FormState>();
+  @override
+  Widget build(BuildContext context) {
+    return Form(
+      key: formKey,
+      child: Column(
+        children: <Widget>[
+          BasicDateField(),
+          SizedBox(height: 16),
+          BasicTimeField(),
+          SizedBox(height: 16),
+          BasicDateTimeField(),
+          SizedBox(height: 16),
+          IosStylePickers(),
+          SizedBox(height: 16),
+          ComplexDateTimeField(),
+          SizedBox(height: 16),
+          RaisedButton(
+            child: Text('Save'),
+            onPressed: () => formKey.currentState.save(),
+          ),
+          RaisedButton(
+            child: Text('Reset'),
+            onPressed: () => formKey.currentState.reset(),
+          ),
+          RaisedButton(
+            child: Text('Validate'),
+            onPressed: () => formKey.currentState.validate(),
+          ),
+        ],
       ),
     );
   }
@@ -176,12 +190,13 @@ class _ComplexDateTimeFieldState extends State<ComplexDateTimeField> {
   bool autoValidate = random.nextBool();
   bool readOnly = random.nextBool();
   bool showResetIcon = random.nextBool();
-  DateTime value;
+  DateTime value = DateTime(2000);
   int changedCount = 0;
   int savedCount = 0;
 
   @override
   Widget build(BuildContext context) {
+    print(autoValidate);
     return Column(children: <Widget>[
       Text('Complex date & time field (${format.pattern})'),
       DateTimeField(
@@ -205,7 +220,7 @@ class _ComplexDateTimeFieldState extends State<ComplexDateTimeField> {
         },
         autovalidate: autoValidate,
         validator: (date) => date == null ? 'Invalid date' : null,
-        initialValue: DateTime(2000),
+        initialValue: value,
         onChanged: (date) => setState(() {
           value = date;
           changedCount++;
@@ -215,11 +230,9 @@ class _ComplexDateTimeFieldState extends State<ComplexDateTimeField> {
           savedCount++;
         }),
         resetIcon: showResetIcon ? Icon(Icons.delete) : null,
-        child: TextField(
-          readOnly: readOnly,
-          decoration: InputDecoration(
-              helperText: 'Changed: $changedCount, Saved: $savedCount, $value'),
-        ),
+        readOnly: readOnly,
+        decoration: InputDecoration(
+            helperText: 'Changed: $changedCount, Saved: $savedCount, $value'),
       ),
       CheckboxListTile(
         title: Text('autoValidate'),
