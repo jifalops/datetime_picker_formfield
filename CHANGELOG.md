@@ -1,3 +1,9 @@
+## [0.3.0] - July 14, 2019
+* Rewrote widget to remove extraneous functionality and clean up the logic. It no
+longer calls the system date/time pickers for you, instead many common use cases
+are shown in the included example.
+* Lots of bugfixes.
+
 ## [0.2.0] - May 29, 2019
 
 * Add [datePicker] and [timePicker] callback functions to enable full control of the system dialogs (material vs cupertino, language, theme, etc.)
