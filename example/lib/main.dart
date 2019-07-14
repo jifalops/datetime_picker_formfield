@@ -1,8 +1,10 @@
-import 'dart:math';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
+// For changing the language
+import 'package:flutter_localizations/flutter_localizations.dart';
+// import 'package:flutter_cupertino_localizations/flutter_cupertino_localizations.dart';
 
 const appName = 'DateTimeField Example';
 
@@ -12,6 +14,18 @@ void main() => runApp(MaterialApp(
       theme: ThemeData.light().copyWith(
           inputDecorationTheme:
               InputDecorationTheme(border: OutlineInputBorder())),
+      localizationsDelegates: [
+        // ... app-specific localization delegate[s] here
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: [
+        const Locale('en'), // English
+        const Locale('es'), // Spanish
+        const Locale('fr'), // French
+        const Locale('zh'), // Chinese
+      ],
     ));
 
 class MyHomePage extends StatefulWidget {
@@ -25,7 +39,7 @@ class MyHomePageState extends State<MyHomePage> {
     return Scaffold(
         appBar: AppBar(title: Text(appName)),
         body: ListView(
-          padding: EdgeInsets.all(16),
+          padding: EdgeInsets.all(24),
           children: <Widget>[
             DateTimeForm(),
           ],
@@ -45,17 +59,22 @@ class _DateTimeFormState extends State<DateTimeForm> {
     return Form(
       key: formKey,
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           BasicDateField(),
-          SizedBox(height: 16),
+          SizedBox(height: 24),
           BasicTimeField(),
-          SizedBox(height: 16),
+          SizedBox(height: 24),
+          Clock24Example(),
+          SizedBox(height: 24),
+          FrenchExample(),
+          SizedBox(height: 24),
           BasicDateTimeField(),
-          SizedBox(height: 16),
+          SizedBox(height: 24),
           IosStylePickers(),
-          SizedBox(height: 16),
+          SizedBox(height: 24),
           ComplexDateTimeField(),
-          SizedBox(height: 16),
+          SizedBox(height: 24),
           RaisedButton(
             child: Text('Save'),
             onPressed: () => formKey.currentState.save(),
@@ -185,11 +204,10 @@ class ComplexDateTimeField extends StatefulWidget {
 
 class _ComplexDateTimeFieldState extends State<ComplexDateTimeField> {
   final format = DateFormat("yyyy-MM-dd HH:mm");
-  static final random = Random();
 
-  bool autoValidate = random.nextBool();
-  bool readOnly = random.nextBool();
-  bool showResetIcon = random.nextBool();
+  bool autoValidate = true;
+  bool readOnly = true;
+  bool showResetIcon = true;
   DateTime value = DateTime(2000);
   int changedCount = 0;
   int savedCount = 0;
@@ -248,6 +266,71 @@ class _ComplexDateTimeFieldState extends State<ComplexDateTimeField> {
         title: Text('showResetIcon'),
         value: showResetIcon,
         onChanged: (value) => setState(() => showResetIcon = value),
+      ),
+    ]);
+  }
+}
+
+class Clock24Example extends StatelessWidget {
+  final format = DateFormat("HH:mm");
+  @override
+  Widget build(BuildContext context) {
+    return Column(children: <Widget>[
+      Text('24 hour clock'),
+      DateTimeField(
+        format: format,
+        onShowPicker: (context, currentValue) async {
+          final time = await showTimePicker(
+            context: context,
+            initialTime: TimeOfDay.fromDateTime(currentValue ?? DateTime.now()),
+            builder: (context, child) => MediaQuery(
+                data: MediaQuery.of(context)
+                    .copyWith(alwaysUse24HourFormat: true),
+                child: child),
+          );
+          return DateTimeField.convert(time);
+        },
+      ),
+    ]);
+  }
+}
+
+class FrenchExample extends StatelessWidget {
+  final format = DateFormat("yyyy-MM-dd HH:mm");
+  @override
+  Widget build(BuildContext context) {
+    return Column(children: <Widget>[
+      Text('Changing the pickers\' language'),
+      DateTimeField(
+        format: format,
+        onShowPicker: (context, currentValue) async {
+          final date = await showDatePicker(
+            context: context,
+            firstDate: DateTime(1900),
+            initialDate: DateTime.now(),
+            lastDate: DateTime(2100),
+            builder: (context, child) => Localizations.override(
+              context: context,
+              locale: Locale('zh'),
+              child: child,
+            ),
+          );
+          if (date != null) {
+            final time = await showTimePicker(
+              context: context,
+              initialTime:
+                  TimeOfDay.fromDateTime(currentValue ?? DateTime.now()),
+              builder: (context, child) => Localizations.override(
+                context: context,
+                locale: Locale('zh'),
+                child: child,
+              ),
+            );
+            return DateTimeField.combine(date, time);
+          } else {
+            return currentValue;
+          }
+        },
       ),
     ]);
   }

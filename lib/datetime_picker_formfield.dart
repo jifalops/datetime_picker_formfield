@@ -250,6 +250,8 @@ class _DateTimeFieldState extends FormFieldState<DateTime> {
   Future<void> requestUpdate() async {
     if (!isShowingDialog) {
       isShowingDialog = true;
+      /// Hide the keyboard.
+      FocusScope.of(context).requestFocus(FocusNode());
       final newValue = await widget.onShowPicker(context, value);
       isShowingDialog = false;
       if (newValue != null) {
