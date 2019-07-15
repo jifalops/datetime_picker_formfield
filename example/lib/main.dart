@@ -67,7 +67,7 @@ class _DateTimeFormState extends State<DateTimeForm> {
           SizedBox(height: 24),
           Clock24Example(),
           SizedBox(height: 24),
-          FrenchExample(),
+          LocaleExample(),
           SizedBox(height: 24),
           BasicDateTimeField(),
           SizedBox(height: 24),
@@ -75,18 +75,18 @@ class _DateTimeFormState extends State<DateTimeForm> {
           SizedBox(height: 24),
           ComplexDateTimeField(),
           SizedBox(height: 24),
-          // RaisedButton(
-          //   child: Text('Save'),
-          //   onPressed: () => formKey.currentState.save(),
-          // ),
-          // RaisedButton(
-          //   child: Text('Reset'),
-          //   onPressed: () => formKey.currentState.reset(),
-          // ),
-          // RaisedButton(
-          //   child: Text('Validate'),
-          //   onPressed: () => formKey.currentState.validate(),
-          // ),
+          RaisedButton(
+            child: Text('Save'),
+            onPressed: () => formKey.currentState.save(),
+          ),
+          RaisedButton(
+            child: Text('Reset'),
+            onPressed: () => formKey.currentState.reset(),
+          ),
+          RaisedButton(
+            child: Text('Validate'),
+            onPressed: () => formKey.currentState.validate(),
+          ),
         ],
       ),
     );
@@ -204,11 +204,12 @@ class ComplexDateTimeField extends StatefulWidget {
 
 class _ComplexDateTimeFieldState extends State<ComplexDateTimeField> {
   final format = DateFormat("yyyy-MM-dd HH:mm");
+  final initialValue = DateTime.now();
 
-  bool autoValidate = true;
+  bool autoValidate = false;
   bool readOnly = true;
   bool showResetIcon = true;
-  DateTime value = DateTime(2000);
+  DateTime value = DateTime.now();
   int changedCount = 0;
   int savedCount = 0;
 
@@ -237,7 +238,7 @@ class _ComplexDateTimeFieldState extends State<ComplexDateTimeField> {
         },
         autovalidate: autoValidate,
         validator: (date) => date == null ? 'Invalid date' : null,
-        initialValue: value,
+        initialValue: initialValue,
         onChanged: (date) => setState(() {
           value = date;
           changedCount++;
@@ -296,7 +297,7 @@ class Clock24Example extends StatelessWidget {
   }
 }
 
-class FrenchExample extends StatelessWidget {
+class LocaleExample extends StatelessWidget {
   final format = DateFormat("yyyy-MM-dd HH:mm");
   @override
   Widget build(BuildContext context) {

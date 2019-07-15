@@ -1,3 +1,6 @@
+## [0.3.1] - July 14, 2019
+* Improved interaction with forms.
+
 ## [0.3.0] - July 14, 2019
 * Rewrote widget to remove extraneous functionality and clean up the logic. It no
 longer calls the system date/time pickers for you, instead many common use cases

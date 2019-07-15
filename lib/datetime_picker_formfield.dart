@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart' show DateFormat;
-import 'package:flutter/services.dart' show TextInputFormatter;
 
 /// A [FormField<DateTime>] that integrates a text input with time-chooser UIs.
 class DateTimeField extends FormField<DateTime> {
@@ -25,10 +24,69 @@ class DateTimeField extends FormField<DateTime> {
             key: key,
             autovalidate: autovalidate,
             initialValue: initialValue,
-            enabled: child.enabled,
+            enabled: child.enabled ?? true,
             validator: validator,
             onSaved: onSaved,
-            builder: (state) => Container());
+            builder: (field) {
+              final _DateTimeFieldState state = field;
+              return TextFormField(
+                // Key key,
+                controller: state.controller,
+                focusNode: state.focusNode,
+                decoration:
+                    resetIcon == null || child.decoration.suffixIcon != null
+                        ? child.decoration
+                        : child.decoration.copyWith(
+                            suffixIcon: state.showResetIcon
+                                ? IconButton(
+                                    icon: resetIcon,
+                                    onPressed: () {
+                                      state.focusNode.unfocus();
+                                      state.didChange(null);
+                                    },
+                                  )
+                                : Container(width: 0, height: 0),
+                          ),
+                // Cannot provide initialValue if controller is provided.
+                // initialValue: format(initialValue),
+                keyboardType: child.keyboardType,
+                textCapitalization: child.textCapitalization,
+                textInputAction: child.textInputAction,
+                style: child.style,
+                strutStyle: child.strutStyle,
+                textDirection: child.textDirection,
+                textAlign: child.textAlign,
+                autofocus: child.autofocus,
+                readOnly: child.readOnly,
+                showCursor: child.showCursor,
+                obscureText: child.obscureText,
+                autocorrect: child.autocorrect,
+                autovalidate: autovalidate ?? false,
+                maxLengthEnforced: child.maxLengthEnforced,
+                maxLines: child.maxLines,
+                minLines: child.minLines,
+                expands: child.expands,
+                maxLength: child.maxLength,
+                onEditingComplete: child.onEditingComplete,
+                // Unused.
+                // onFieldSubmitted: child.onFieldSubmitted,
+                // Causes onSaved to be called twice.
+                // onSaved: (string) =>
+                //     onSaved == null ? null : onSaved(state.parse(string)),
+                validator: (string) =>
+                    validator == null ? null : validator(state.parse(string)),
+                inputFormatters: child.inputFormatters,
+                enabled: child.enabled ?? true,
+                cursorWidth: child.cursorWidth,
+                cursorRadius: child.cursorRadius,
+                cursorColor: child.cursorColor,
+                keyboardAppearance: child.keyboardAppearance,
+                scrollPadding: child.scrollPadding,
+                enableInteractiveSelection:
+                    child.enableInteractiveSelection ?? true,
+                buildCounter: child.buildCounter,
+              );
+            });
 
   /// For representing the date as a string e.g.
   /// `DateFormat("EEEE, MMMM d, yyyy 'at' h:mma")`
@@ -39,7 +97,7 @@ class DateTimeField extends FormField<DateTime> {
   final Future<DateTime> Function(BuildContext context, DateTime currentValue)
       onShowPicker;
 
-  // The text field to manage.
+  /// The text field to draw properties from.
   final TextField child;
 
   /// The [InputDecoration.suffixIcon] to show when the field has text. Tapping
@@ -100,8 +158,7 @@ class _DateTimeFieldState extends FormFieldState<DateTime> {
   /// `true` when updating the value after programmatically changing the text
   bool changingValue = false;
 
-  /// The most recent non-null value;
-  DateTime lastValidValue;
+  DateTime previousValue;
 
   @override
   DateTimeField get widget => super.widget;
@@ -115,17 +172,21 @@ class _DateTimeFieldState extends FormFieldState<DateTime> {
   @override
   void initState() {
     super.initState();
-    if (value != null) {
-      lastValidValue = value;
-    }
-    controller = widget.child.controller ?? TextEditingController();
-    focusNode = widget.child.focusNode ?? FocusNode();
+    controller =
+        controller ?? widget.child.controller ?? TextEditingController();
+    focusNode = focusNode ?? widget.child.focusNode ?? FocusNode();
     hadFocus = focusNode.hasFocus;
     hadText = controller.text.isNotEmpty;
     focusNode.addListener(focusChanged);
     controller.addListener(textChanged);
     // notifies listeners of the initalValue.
     setValue(widget.initialValue);
+  }
+
+  @override
+  void reset() {
+    super.reset();
+    didChange(widget.initialValue);
   }
 
   @override
@@ -146,30 +207,28 @@ class _DateTimeFieldState extends FormFieldState<DateTime> {
   @protected
   @override
   void setValue(DateTime value) {
-    bool changed = value != super.value;
+    previousValue = value;
     super.setValue(value);
-    if (value != null) {
-      lastValidValue = value;
-    }
     if (!changingValue) {
       changingText = true;
       controller.text = format(value);
       changingText = false;
     }
-    if (changed && widget.onChanged != null) widget.onChanged(value);
   }
 
   @override
   void didChange(DateTime value) {
     setValue(value);
     super.didChange(value);
+    if (value != previousValue && widget.onChanged != null)
+      widget.onChanged(value);
+    setState(() {});
   }
 
   Future<void> requestUpdate() async {
     if (!isShowingDialog) {
       isShowingDialog = true;
-
-      /// Hide the keyboard.
+      // Hide the keyboard.
       FocusScope.of(context).requestFocus(FocusNode());
       final newValue = await widget.onShowPicker(context, value);
       isShowingDialog = false;
@@ -201,65 +260,6 @@ class _DateTimeFieldState extends FormFieldState<DateTime> {
         changingValue = false;
       }
     }
-
     hadText = hasText;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return TextFormField(
-      // Key key,
-      controller: controller,
-      focusNode: focusNode,
-      decoration:
-          widget.resetIcon == null || widget.child.decoration.suffixIcon != null
-              ? widget.child.decoration
-              : widget.child.decoration.copyWith(
-                  suffixIcon: showResetIcon
-                      ? IconButton(
-                          icon: widget.resetIcon,
-                          onPressed: () {
-                            focusNode.unfocus();
-                            controller.clear();
-                          },
-                        )
-                      : Container(width: 0, height: 0),
-                ),
-      // Cannot provide initialValue if controller is provided.
-      // initialValue: format(widget.initialValue),
-      keyboardType: widget.child.keyboardType,
-      textCapitalization: widget.child.textCapitalization,
-      textInputAction: widget.child.textInputAction,
-      style: widget.child.style,
-      strutStyle: widget.child.strutStyle,
-      textDirection: widget.child.textDirection,
-      textAlign: widget.child.textAlign,
-      autofocus: widget.child.autofocus,
-      readOnly: widget.child.readOnly,
-      showCursor: widget.child.showCursor,
-      obscureText: widget.child.obscureText,
-      autocorrect: widget.child.autocorrect,
-      autovalidate: widget.autovalidate,
-      maxLengthEnforced: widget.child.maxLengthEnforced,
-      maxLines: widget.child.maxLines,
-      minLines: widget.child.minLines,
-      expands: widget.child.expands,
-      maxLength: widget.child.maxLength,
-      onEditingComplete: widget.child.onEditingComplete,
-      // Unused.
-      // onFieldSubmitted: widget.child.onFieldSubmitted,
-      onSaved: (string) => widget.onSaved(parse(string)),
-      validator: (string) => widget.validator(parse(string)),
-      inputFormatters: widget.child.inputFormatters,
-      enabled: widget.child.enabled ?? true,
-      cursorWidth: widget.child.cursorWidth,
-      cursorRadius: widget.child.cursorRadius,
-      cursorColor: widget.child.cursorColor,
-      keyboardAppearance: widget.child.keyboardAppearance,
-      scrollPadding: widget.child.scrollPadding,
-      enableInteractiveSelection:
-          widget.child.enableInteractiveSelection ?? true,
-      buildCounter: widget.child.buildCounter,
-    );
   }
 }
