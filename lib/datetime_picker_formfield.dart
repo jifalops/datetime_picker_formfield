@@ -40,10 +40,7 @@ class DateTimeField extends FormField<DateTime> {
                             suffixIcon: state.showResetIcon
                                 ? IconButton(
                                     icon: resetIcon,
-                                    onPressed: () {
-                                      state.focusNode.unfocus();
-                                      state.didChange(null);
-                                    },
+                                    onPressed: state.clear,
                                   )
                                 : Container(width: 0, height: 0),
                           ),
@@ -158,8 +155,6 @@ class _DateTimeFieldState extends FormFieldState<DateTime> {
   /// `true` when updating the value after programmatically changing the text
   bool changingValue = false;
 
-  DateTime previousValue;
-
   @override
   DateTimeField get widget => super.widget;
 
@@ -179,7 +174,6 @@ class _DateTimeFieldState extends FormFieldState<DateTime> {
     hadText = controller.text.isNotEmpty;
     focusNode.addListener(focusChanged);
     controller.addListener(textChanged);
-    // notifies listeners of the initalValue.
     setValue(widget.initialValue);
   }
 
@@ -204,11 +198,7 @@ class _DateTimeFieldState extends FormFieldState<DateTime> {
     super.dispose();
   }
 
-  @protected
-  @override
-  void setValue(DateTime value) {
-    previousValue = value;
-    super.setValue(value);
+  void updateText() {
     if (!changingValue) {
       changingText = true;
       controller.text = format(value);
@@ -216,13 +206,18 @@ class _DateTimeFieldState extends FormFieldState<DateTime> {
     }
   }
 
+  @protected
+  @override
+  void setValue(DateTime value) {
+    super.setValue(value);
+    updateText();
+  }
+
   @override
   void didChange(DateTime value) {
-    setValue(value);
     super.didChange(value);
-    if (value != previousValue && widget.onChanged != null)
-      widget.onChanged(value);
-    setState(() {});
+    updateText();
+    if (widget.onChanged != null) widget.onChanged(value);
   }
 
   Future<void> requestUpdate() async {
@@ -261,5 +256,15 @@ class _DateTimeFieldState extends FormFieldState<DateTime> {
       }
     }
     hadText = hasText;
+  }
+
+  void clear() async {
+    focusNode.removeListener(focusChanged);
+    // Fix for ripple effect throwing exception
+    // and the field staying gray.
+    await Future.delayed(Duration(milliseconds: 10));
+    didChange(null);
+    focusNode.unfocus();
+    focusNode.addListener(focusChanged);
   }
 }
