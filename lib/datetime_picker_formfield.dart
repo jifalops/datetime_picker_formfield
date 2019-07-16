@@ -1,13 +1,18 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart' show TextInputFormatter;
 import 'package:intl/intl.dart' show DateFormat;
 
 /// A [FormField<DateTime>] that integrates a text input with time-chooser UIs.
+///
+/// It borrows many of it's parameters from [TextFormField].
+///
+/// When a [controller] is specified, [initialValue] must be null (the
+/// default).
 class DateTimeField extends FormField<DateTime> {
   DateTimeField({
     @required this.format,
     @required this.onShowPicker,
-    this.child: const TextField(),
 
     // From super
     Key key,
@@ -15,73 +20,105 @@ class DateTimeField extends FormField<DateTime> {
     FormFieldValidator<DateTime> validator,
     DateTime initialValue,
     bool autovalidate = false,
-    // bool enabled = true,
+    bool enabled = true,
 
     // Features
     this.resetIcon = const Icon(Icons.close),
     this.onChanged,
+
+    // From TextFormField
+    // Key key,
+    this.controller,
+    // String initialValue,
+    this.focusNode,
+    InputDecoration decoration = const InputDecoration(),
+    TextInputType keyboardType,
+    TextCapitalization textCapitalization = TextCapitalization.none,
+    TextInputAction textInputAction,
+    TextStyle style,
+    StrutStyle strutStyle,
+    TextDirection textDirection,
+    TextAlign textAlign = TextAlign.start,
+    bool autofocus = false,
+    this.readOnly = false,
+    bool showCursor,
+    bool obscureText = false,
+    bool autocorrect = true,
+    // bool autovalidate = false,
+    bool maxLengthEnforced = true,
+    int maxLines = 1,
+    int minLines,
+    bool expands = false,
+    int maxLength,
+    VoidCallback onEditingComplete,
+    ValueChanged<DateTime> onFieldSubmitted,
+    // FormFieldSetter<String> onSaved,
+    // FormFieldValidator<String> validator,
+    List<TextInputFormatter> inputFormatters,
+    // bool enabled = true,
+    double cursorWidth = 2.0,
+    Radius cursorRadius,
+    Color cursorColor,
+    Brightness keyboardAppearance,
+    EdgeInsets scrollPadding = const EdgeInsets.all(20.0),
+    bool enableInteractiveSelection = true,
+    InputCounterWidgetBuilder buildCounter,
   }) : super(
             key: key,
             autovalidate: autovalidate,
             initialValue: initialValue,
-            enabled: child.enabled ?? true,
+            enabled: enabled ?? true,
             validator: validator,
             onSaved: onSaved,
             builder: (field) {
               final _DateTimeFieldState state = field;
-              return TextFormField(
-                // Key key,
-                controller: state.controller,
-                focusNode: state.focusNode,
-                decoration:
-                    resetIcon == null || child.decoration.suffixIcon != null
-                        ? child.decoration
-                        : child.decoration.copyWith(
-                            suffixIcon: state.showResetIcon
-                                ? IconButton(
-                                    icon: resetIcon,
-                                    onPressed: state.clear,
-                                  )
-                                : Container(width: 0, height: 0),
-                          ),
-                // Cannot provide initialValue if controller is provided.
-                // initialValue: format(initialValue),
-                keyboardType: child.keyboardType,
-                textCapitalization: child.textCapitalization,
-                textInputAction: child.textInputAction,
-                style: child.style,
-                strutStyle: child.strutStyle,
-                textDirection: child.textDirection,
-                textAlign: child.textAlign,
-                autofocus: child.autofocus,
-                readOnly: child.readOnly,
-                showCursor: child.showCursor,
-                obscureText: child.obscureText,
-                autocorrect: child.autocorrect,
-                autovalidate: autovalidate ?? false,
-                maxLengthEnforced: child.maxLengthEnforced,
-                maxLines: child.maxLines,
-                minLines: child.minLines,
-                expands: child.expands,
-                maxLength: child.maxLength,
-                onEditingComplete: child.onEditingComplete,
-                // Unused.
-                // onFieldSubmitted: child.onFieldSubmitted,
-                // Causes onSaved to be called twice.
-                // onSaved: (string) =>
-                //     onSaved == null ? null : onSaved(state.parse(string)),
-                validator: (string) =>
-                    validator == null ? null : validator(state.parse(string)),
-                inputFormatters: child.inputFormatters,
-                enabled: child.enabled ?? true,
-                cursorWidth: child.cursorWidth,
-                cursorRadius: child.cursorRadius,
-                cursorColor: child.cursorColor,
-                keyboardAppearance: child.keyboardAppearance,
-                scrollPadding: child.scrollPadding,
-                enableInteractiveSelection:
-                    child.enableInteractiveSelection ?? true,
-                buildCounter: child.buildCounter,
+              final InputDecoration effectiveDecoration = (decoration ??
+                      const InputDecoration())
+                  .applyDefaults(Theme.of(field.context).inputDecorationTheme);
+              return TextField(
+                controller: state._effectiveController,
+                focusNode: state._effectiveFocusNode,
+                decoration: effectiveDecoration.copyWith(
+                  errorText: field.errorText,
+                  suffixIcon: state.shouldShowClearIcon(effectiveDecoration)
+                      ? IconButton(
+                          icon: resetIcon,
+                          onPressed: state.clear,
+                        )
+                      : Container(width: 0, height: 0),
+                ),
+                keyboardType: keyboardType,
+                textInputAction: textInputAction,
+                style: style,
+                strutStyle: strutStyle,
+                textAlign: textAlign,
+                textDirection: textDirection,
+                textCapitalization: textCapitalization,
+                autofocus: autofocus,
+                readOnly: readOnly,
+                showCursor: showCursor,
+                obscureText: obscureText,
+                autocorrect: autocorrect,
+                maxLengthEnforced: maxLengthEnforced,
+                maxLines: maxLines,
+                minLines: minLines,
+                expands: expands,
+                maxLength: maxLength,
+                onChanged: (string) =>
+                    field.didChange(tryParse(string, format)),
+                onEditingComplete: onEditingComplete,
+                onSubmitted: (string) => onFieldSubmitted == null
+                    ? null
+                    : onFieldSubmitted(tryParse(string, format)),
+                inputFormatters: inputFormatters,
+                enabled: enabled,
+                cursorWidth: cursorWidth,
+                cursorRadius: cursorRadius,
+                cursorColor: cursorColor,
+                scrollPadding: scrollPadding,
+                keyboardAppearance: keyboardAppearance,
+                enableInteractiveSelection: enableInteractiveSelection,
+                buildCounter: buildCounter,
               );
             });
 
@@ -94,16 +131,15 @@ class DateTimeField extends FormField<DateTime> {
   final Future<DateTime> Function(BuildContext context, DateTime currentValue)
       onShowPicker;
 
-  /// The text field to draw properties from.
-  final TextField child;
-
   /// The [InputDecoration.suffixIcon] to show when the field has text. Tapping
   /// the icon will clear the text field. Set this to `null` to disable that
   /// behavior.
   final Icon resetIcon;
 
-  /// Called whenever the DateTime value changes.
-  final ValueChanged<DateTime> onChanged;
+  final TextEditingController controller;
+  final FocusNode focusNode;
+  final bool readOnly;
+  final void Function(DateTime value) onChanged;
 
   @override
   _DateTimeFieldState createState() => _DateTimeFieldState();
@@ -114,7 +150,7 @@ class DateTimeField extends FormField<DateTime> {
       try {
         return format.format(date);
       } catch (e) {
-        print('Error formatting date: $e');
+        // print('Error formatting date: $e');
       }
     }
     return '';
@@ -126,7 +162,7 @@ class DateTimeField extends FormField<DateTime> {
       try {
         return format.parse(string);
       } catch (e) {
-        print('Error parsing date: $e');
+        // print('Error parsing date: $e');
       }
     }
     return null;
@@ -141,84 +177,94 @@ class DateTimeField extends FormField<DateTime> {
 }
 
 class _DateTimeFieldState extends FormFieldState<DateTime> {
-  TextEditingController controller;
-  FocusNode focusNode;
-
-  bool showResetIcon = false;
+  TextEditingController _controller;
+  FocusNode _focusNode;
   bool isShowingDialog = false;
-  bool hadFocus;
-  bool hadText;
-
-  /// `true` when updating the text after programmatically changing the value
-  bool changingText = false;
-
-  /// `true` when updating the value after programmatically changing the text
-  bool changingValue = false;
+  bool hadFocus = false;
 
   @override
   DateTimeField get widget => super.widget;
 
-  bool get hasFocus => focusNode.hasFocus;
-  bool get hasText => controller.text.isNotEmpty;
+  TextEditingController get _effectiveController =>
+      widget.controller ?? _controller;
+  FocusNode get _effectiveFocusNode => widget.focusNode ?? _focusNode;
 
-  String format(DateTime date) => DateTimeField.tryFormat(date, widget.format);
-  DateTime parse(String text) => DateTimeField.tryParse(text, widget.format);
+  bool get hasFocus => _effectiveFocusNode.hasFocus;
+  bool get hasText => _effectiveController.text.isNotEmpty;
 
   @override
   void initState() {
     super.initState();
-    controller =
-        controller ?? widget.child.controller ?? TextEditingController();
-    focusNode = focusNode ?? widget.child.focusNode ?? FocusNode();
-    hadFocus = focusNode.hasFocus;
-    hadText = controller.text.isNotEmpty;
-    focusNode.addListener(focusChanged);
-    controller.addListener(textChanged);
-    setValue(widget.initialValue);
+    if (widget.controller == null) {
+      _controller = TextEditingController(text: format(widget.initialValue));
+    }
+    if (widget.focusNode == null) {
+      _focusNode = FocusNode();
+    }
+    _effectiveController.addListener(_handleControllerChanged);
+    _effectiveFocusNode.addListener(_handleFocusChanged);
+  }
+
+  @override
+  void didUpdateWidget(DateTimeField oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.controller != oldWidget.controller) {
+      oldWidget.controller?.removeListener(_handleControllerChanged);
+      widget.controller?.addListener(_handleControllerChanged);
+
+      if (oldWidget.controller != null && widget.controller == null) {
+        _controller =
+            TextEditingController.fromValue(oldWidget.controller.value);
+      }
+      if (widget.controller != null) {
+        setValue(parse(widget.controller.text));
+        if (oldWidget.controller == null) _controller = null;
+      }
+    }
+    if (widget.focusNode != oldWidget.focusNode) {
+      oldWidget.focusNode?.removeListener(_handleFocusChanged);
+      widget.focusNode?.addListener(_handleFocusChanged);
+
+      if (oldWidget.focusNode != null && widget.focusNode == null) {
+        _focusNode = FocusNode();
+      }
+    }
+  }
+
+  @override
+  void didChange(DateTime value) {
+    if (widget.onChanged != null) widget.onChanged(value);
+    super.didChange(value);
+  }
+
+  @override
+  void dispose() {
+    widget.controller?.removeListener(_handleControllerChanged);
+    widget.focusNode?.removeListener(_handleFocusChanged);
+    super.dispose();
   }
 
   @override
   void reset() {
     super.reset();
+    _effectiveController.text = format(widget.initialValue);
     didChange(widget.initialValue);
   }
 
-  @override
-  void dispose() {
-    if (controller != widget.child.controller) {
-      controller.dispose();
-    } else {
-      controller.removeListener(textChanged);
-    }
-    if (focusNode != widget.child.focusNode) {
-      focusNode.dispose();
-    } else {
-      focusNode.removeListener(focusChanged);
-    }
-    super.dispose();
+  void _handleControllerChanged() {
+    // Suppress changes that originated from within this class.
+    //
+    // In the case where a controller has been passed in to this widget, we
+    // register this change listener. In these cases, we'll also receive change
+    // notifications for changes originating from within this class -- for
+    // example, the reset() method. In such cases, the FormField value will
+    // already have been set.
+    if (_effectiveController.text != format(value))
+      didChange(parse(_effectiveController.text));
   }
 
-  void updateText() {
-    if (!changingValue) {
-      changingText = true;
-      controller.text = format(value);
-      changingText = false;
-    }
-  }
-
-  @protected
-  @override
-  void setValue(DateTime value) {
-    super.setValue(value);
-    updateText();
-  }
-
-  @override
-  void didChange(DateTime value) {
-    super.didChange(value);
-    updateText();
-    if (widget.onChanged != null) widget.onChanged(value);
-  }
+  String format(DateTime date) => DateTimeField.tryFormat(date, widget.format);
+  DateTime parse(String text) => DateTimeField.tryParse(text, widget.format);
 
   Future<void> requestUpdate() async {
     if (!isShowingDialog) {
@@ -228,43 +274,28 @@ class _DateTimeFieldState extends FormFieldState<DateTime> {
       final newValue = await widget.onShowPicker(context, value);
       isShowingDialog = false;
       if (newValue != null) {
-        didChange(newValue);
+        _effectiveController.text = format(newValue);
       }
     }
   }
 
-  void focusChanged() {
-    if (hasFocus && !hadFocus && (!hasText || widget.child.readOnly)) {
+  void _handleFocusChanged() {
+    if (hasFocus && !hadFocus && (!hasText || widget.readOnly)) {
       requestUpdate();
     } else if (hadFocus && !hasFocus) {}
-
     hadFocus = hasFocus;
   }
 
-  void textChanged() {
-    if (showResetIcon != hasText &&
-        widget.resetIcon != null &&
-        widget.child.decoration.suffixIcon == null) {
-      setState(() => showResetIcon = !showResetIcon);
-    }
-    if (!changingText) {
-      final date = parse(controller.text);
-      if (date != value) {
-        changingValue = true;
-        didChange(date);
-        changingValue = false;
-      }
-    }
-    hadText = hasText;
-  }
-
   void clear() async {
-    focusNode.removeListener(focusChanged);
+    _effectiveFocusNode.removeListener(_handleFocusChanged);
     // Fix for ripple effect throwing exception
     // and the field staying gray.
     await Future.delayed(Duration(milliseconds: 10));
-    didChange(null);
-    focusNode.unfocus();
-    focusNode.addListener(focusChanged);
+    _effectiveController.text = '';
+    _effectiveFocusNode.unfocus();
+    _effectiveFocusNode.addListener(_handleFocusChanged);
   }
+
+  bool shouldShowClearIcon(InputDecoration decoration) =>
+      widget.resetIcon != null && hasText && decoration.suffixIcon == null;
 }

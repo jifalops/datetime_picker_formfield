@@ -114,7 +114,7 @@ class BasicDateField extends StatelessWidget {
 }
 
 class BasicTimeField extends StatelessWidget {
-  final format = DateFormat("HH:mm");
+  final format = DateFormat("hh:mm a");
   @override
   Widget build(BuildContext context) {
     return Column(children: <Widget>[
@@ -248,11 +248,9 @@ class _ComplexDateTimeFieldState extends State<ComplexDateTimeField> {
           savedCount++;
         }),
         resetIcon: showResetIcon ? Icon(Icons.delete) : null,
-        child: TextField(
-          readOnly: readOnly,
-          decoration: InputDecoration(
-              helperText: 'Changed: $changedCount, Saved: $savedCount, $value'),
-        ),
+        readOnly: readOnly,
+        decoration: InputDecoration(
+            helperText: 'Changed: $changedCount, Saved: $savedCount, $value'),
       ),
       CheckboxListTile(
         title: Text('autoValidate'),
