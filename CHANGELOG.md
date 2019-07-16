@@ -1,4 +1,4 @@
-## [1.0.0-pre.1] - July 16, 2019
+## [0.4.0], [1.0.0-pre.1] - July 16, 2019
 
 - [child] removed and the parameters of [TextFormField] were added to the widget directly.
 - Fix bugs when using with a form.
