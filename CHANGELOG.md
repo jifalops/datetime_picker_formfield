@@ -1,3 +1,8 @@
+## [1.0.0-pre.1] - July 16, 2019
+
+- [child] removed and the parameters of [TextFormField] were added to the widget directly.
+- Fix bugs when using with a form.
+
 ## [0.3.2] - July 16, 2019
 
 - Fix for ripple effect exception causing the field to turn gray.

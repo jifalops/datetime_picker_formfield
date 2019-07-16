@@ -1,6 +1,6 @@
 name: datetime_picker_formfield
-description: A widget that wraps a TextFormField and integrates the date and/or time picker dialogs.
-version: 0.3.2
+description: A TextFormField that emits DateTimes and shows Material, Cupertino, and other style picker dialogs.
+version: 1.0.0-pre.1
 author: Jacob Phillips <jifalops@gmail.com>
 homepage: https://github.com/jifalops/datetime_picker_formfield
 

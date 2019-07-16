@@ -1,6 +1,6 @@
-# Date/Time picker FormFields
+# DateTimeField
 
-A widget that wraps a TextFormField and integrates the date and/or time picker dialogs.
+A TextFormField that emits DateTimes and shows Material, Cupertino, and other style picker dialogs.
 
 ## Example
 
