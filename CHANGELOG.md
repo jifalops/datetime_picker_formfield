@@ -16,6 +16,7 @@
 * Rewrote widget to remove extraneous functionality and clean up the logic. It no
 longer calls the system date/time pickers for you, instead many common use cases
 are shown in the included example.
+* Renamed DateTimePickerFormField to DateTimeField.
 * Lots of bugfixes.
 
 ## [0.2.0] - May 29, 2019

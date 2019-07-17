@@ -290,6 +290,7 @@ class _DateTimeFieldState extends FormFieldState<DateTime> {
     _effectiveFocusNode.removeListener(_handleFocusChanged);
     // Fix for ripple effect throwing exception
     // and the field staying gray.
+    // https://github.com/flutter/flutter/issues/36324
     await Future.delayed(Duration(milliseconds: 10));
     _effectiveController.text = '';
     _effectiveFocusNode.unfocus();
