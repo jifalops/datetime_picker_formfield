@@ -270,26 +270,25 @@ class _DateTimeFieldState extends FormFieldState<DateTime> {
     if (!isShowingDialog) {
       isShowingDialog = true;
 
-      widget.onShowPicker(context, value).then((newValue) {
-        isShowingDialog = false;
-        if (newValue != null) {
-          _effectiveController.text = format(newValue);
-        }
-      });
+      final newValue = await widget.onShowPicker(context, value);
+      isShowingDialog = false;
+      if (newValue != null) {
+        _effectiveController.text = format(newValue);
+      }
     }
   }
 
   void _handleFocusChanged() {
     if (hasFocus && !hadFocus && (!hasText || widget.readOnly)) {
+      _effectiveFocusNode.unfocus();
       requestUpdate();
     } else if (hadFocus && !hasFocus) {}
     hadFocus = hasFocus;
   }
 
   void clear() {
-    _effectiveFocusNode.unfocus();
-
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      _effectiveFocusNode.unfocus();
       _effectiveController.clear();
       requestUpdate();
     });
