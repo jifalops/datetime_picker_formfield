@@ -269,8 +269,6 @@ class _DateTimeFieldState extends FormFieldState<DateTime> {
   Future<void> requestUpdate() async {
     if (!isShowingDialog) {
       isShowingDialog = true;
-      // Hide the keyboard.
-      FocusScope.of(context).requestFocus(FocusNode());
       final newValue = await widget.onShowPicker(context, value);
       isShowingDialog = false;
       if (newValue != null) {
@@ -281,22 +279,30 @@ class _DateTimeFieldState extends FormFieldState<DateTime> {
 
   void _handleFocusChanged() {
     if (hasFocus && !hadFocus && (!hasText || widget.readOnly)) {
+      hadFocus = hasFocus;
+      _hideKeyboard();
       requestUpdate();
-    } else if (hadFocus && !hasFocus) {}
-    hadFocus = hasFocus;
+    } else {
+      hadFocus = hasFocus;
+    }
+  }
+
+  void _hideKeyboard() {
+    Future.microtask(() => FocusScope.of(context).requestFocus(FocusNode()));
   }
 
   void clear() async {
-    _effectiveFocusNode.removeListener(_handleFocusChanged);
+    _hideKeyboard();
     // Fix for ripple effect throwing exception
     // and the field staying gray.
     // https://github.com/flutter/flutter/issues/36324
-    await Future.delayed(Duration(milliseconds: 10));
-    _effectiveController.text = '';
-    _effectiveFocusNode.unfocus();
-    _effectiveFocusNode.addListener(_handleFocusChanged);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      setState(() => _effectiveController.clear());
+    });
   }
 
-  bool shouldShowClearIcon(InputDecoration decoration) =>
-      widget.resetIcon != null && hasText && decoration.suffixIcon == null;
+  bool shouldShowClearIcon([InputDecoration decoration]) =>
+      widget.resetIcon != null &&
+      (hasText || hasFocus) &&
+      decoration?.suffixIcon == null;
 }
