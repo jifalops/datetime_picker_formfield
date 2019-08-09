@@ -197,12 +197,14 @@ class _DateTimeFieldState extends FormFieldState<DateTime> {
     super.initState();
     if (widget.controller == null) {
       _controller = TextEditingController(text: format(widget.initialValue));
+      _controller.addListener(_handleControllerChanged);
     }
     if (widget.focusNode == null) {
       _focusNode = FocusNode();
+      _focusNode.addListener(_handleFocusChanged);
     }
-    _effectiveController.addListener(_handleControllerChanged);
-    _effectiveFocusNode.addListener(_handleFocusChanged);
+    widget.controller?.addListener(_handleControllerChanged);
+    widget.focusNode?.addListener(_handleFocusChanged);
   }
 
   @override
@@ -215,10 +217,15 @@ class _DateTimeFieldState extends FormFieldState<DateTime> {
       if (oldWidget.controller != null && widget.controller == null) {
         _controller =
             TextEditingController.fromValue(oldWidget.controller.value);
+        _controller.addListener(_handleControllerChanged);
       }
       if (widget.controller != null) {
         setValue(parse(widget.controller.text));
-        if (oldWidget.controller == null) _controller = null;
+        // Release the controller since it wont be used
+        if (oldWidget.controller == null) {
+          _controller?.dispose();
+          _controller = null;
+        }
       }
     }
     if (widget.focusNode != oldWidget.focusNode) {
@@ -227,6 +234,12 @@ class _DateTimeFieldState extends FormFieldState<DateTime> {
 
       if (oldWidget.focusNode != null && widget.focusNode == null) {
         _focusNode = FocusNode();
+        _focusNode.addListener(_handleFocusChanged);
+      }
+      if (widget.focusNode != null && oldWidget.focusNode == null) {
+        // Release the focus node since it wont be used
+        _focusNode?.dispose();
+        _focusNode = null;
       }
     }
   }
@@ -239,6 +252,14 @@ class _DateTimeFieldState extends FormFieldState<DateTime> {
 
   @override
   void dispose() {
+    // Release the controller
+    _controller?.dispose();
+    _controller = null;
+
+    // Release the focus node
+    _focusNode?.dispose();
+    _focusNode = null;
+
     widget.controller?.removeListener(_handleControllerChanged);
     widget.focusNode?.removeListener(_handleFocusChanged);
     super.dispose();
