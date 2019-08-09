@@ -1,3 +1,7 @@
+## [0.4.2], [1.0.0-pre.3] - August 9, 2019
+
+- Fix #55, ensure controller/focusNode is disposed.
+
 ## [0.4.1], [1.0.0-pre.2] - August 4, 2019
 
 - Fix #50 and #51.
