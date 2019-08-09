@@ -309,7 +309,7 @@ class _DateTimeFieldState extends FormFieldState<DateTime> {
   }
 
   void _hideKeyboard() {
-    Future.microtask(() => FocusScope.of(context).unfocus());
+    Future.microtask(() => FocusScope.of(context).requestFocus(FocusNode()));
   }
 
   void clear() async {
