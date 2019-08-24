@@ -85,7 +85,7 @@ class DateTimeField extends FormField<DateTime> {
                           icon: resetIcon,
                           onPressed: state.clear,
                         )
-                      : Container(width: 0, height: 0),
+                      : null,
                 ),
                 keyboardType: keyboardType,
                 textInputAction: textInputAction,
@@ -133,7 +133,7 @@ class DateTimeField extends FormField<DateTime> {
 
   /// The [InputDecoration.suffixIcon] to show when the field has text. Tapping
   /// the icon will clear the text field. Set this to `null` to disable that
-  /// behavior.
+  /// behavior. Also, setting the suffix icon yourself will override this option.
   final Icon resetIcon;
 
   final TextEditingController controller;
