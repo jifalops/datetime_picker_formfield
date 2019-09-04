@@ -252,14 +252,8 @@ class _DateTimeFieldState extends FormFieldState<DateTime> {
 
   @override
   void dispose() {
-    // Release the controller
     _controller?.dispose();
-    _controller = null;
-
-    // Release the focus node
     _focusNode?.dispose();
-    _focusNode = null;
-
     widget.controller?.removeListener(_handleControllerChanged);
     widget.focusNode?.removeListener(_handleFocusChanged);
     super.dispose();

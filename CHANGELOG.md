@@ -1,3 +1,7 @@
+## [0.4.3], [1.0.0-pre.4] - September 4, 2019
+
+- Fix #61, use null instead of container for empty suffix icon.
+
 ## [0.4.2], [1.0.0-pre.3] - August 9, 2019
 
 - Fix #55, ensure controller/focusNode is disposed.
