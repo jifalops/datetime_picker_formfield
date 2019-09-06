@@ -1,3 +1,7 @@
+## [1.0.0-pre.5] - September 6, 2019
+
+- Upgrade dep, requires Flutter master channel.
+
 ## [0.4.3], [1.0.0-pre.4] - September 4, 2019
 
 - Fix #61, use null instead of container for empty suffix icon.
