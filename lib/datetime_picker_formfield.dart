@@ -40,7 +40,7 @@ class DateTimeField extends FormField<DateTime> {
     TextDirection textDirection,
     TextAlign textAlign = TextAlign.start,
     bool autofocus = false,
-    this.readOnly = false,
+    this.readOnly = true,
     bool showCursor,
     bool obscureText = false,
     bool autocorrect = true,
@@ -89,6 +89,7 @@ class DateTimeField extends FormField<DateTime> {
                 ),
                 keyboardType: keyboardType,
                 textInputAction: textInputAction,
+
                 style: style,
                 strutStyle: strutStyle,
                 textAlign: textAlign,
