@@ -1,6 +1,6 @@
 # DateTimeField
 
-A TextFormField that emits DateTimes and shows Material, Cupertino, and other style picker dialogs.
+A TextFormField that emits DateTimes and helps show Material, Cupertino, and other style picker dialogs.
 
 ## Example
 
