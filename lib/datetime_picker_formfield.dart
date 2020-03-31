@@ -1,4 +1,5 @@
 import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show TextInputFormatter;
 import 'package:intl/intl.dart' show DateFormat;
@@ -25,7 +26,7 @@ class DateTimeField extends FormField<DateTime> {
     // Features
     this.resetIcon = const Icon(Icons.close),
     this.onChanged,
-
+    this.emptyIcon,
     // From TextFormField
     // Key key,
     this.controller,
@@ -85,11 +86,10 @@ class DateTimeField extends FormField<DateTime> {
                           icon: resetIcon,
                           onPressed: state.clear,
                         )
-                      : null,
+                      : emptyIcon,
                 ),
                 keyboardType: keyboardType,
                 textInputAction: textInputAction,
-
                 style: style,
                 strutStyle: strutStyle,
                 textAlign: textAlign,
@@ -136,7 +136,7 @@ class DateTimeField extends FormField<DateTime> {
   /// the icon will clear the text field. Set this to `null` to disable that
   /// behavior. Also, setting the suffix icon yourself will override this option.
   final Icon resetIcon;
-
+  final Icon emptyIcon;
   final TextEditingController controller;
   final FocusNode focusNode;
   final bool readOnly;
