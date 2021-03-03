@@ -11,14 +11,14 @@ import 'package:intl/intl.dart' show DateFormat;
 /// default).
 class DateTimeField extends FormField<DateTime> {
   DateTimeField({
-    @required this.format,
-    @required this.onShowPicker,
+    required this.format,
+    required this.onShowPicker,
 
     // From super
-    Key key,
-    FormFieldSetter<DateTime> onSaved,
-    FormFieldValidator<DateTime> validator,
-    DateTime initialValue,
+    Key? key,
+    FormFieldSetter<DateTime>? onSaved,
+    FormFieldValidator<DateTime>? validator,
+    DateTime? initialValue,
     bool autovalidate = false,
     bool enabled = true,
 
@@ -32,37 +32,37 @@ class DateTimeField extends FormField<DateTime> {
     // String initialValue,
     this.focusNode,
     InputDecoration decoration = const InputDecoration(),
-    TextInputType keyboardType,
+    TextInputType? keyboardType,
     TextCapitalization textCapitalization = TextCapitalization.none,
-    TextInputAction textInputAction,
-    TextStyle style,
-    StrutStyle strutStyle,
-    TextDirection textDirection,
+    TextInputAction? textInputAction,
+    TextStyle? style,
+    StrutStyle? strutStyle,
+    TextDirection? textDirection,
     TextAlign textAlign = TextAlign.start,
     bool autofocus = false,
     this.readOnly = true,
-    bool showCursor,
+    bool? showCursor,
     bool obscureText = false,
     bool autocorrect = true,
     // bool autovalidate = false,
     bool maxLengthEnforced = true,
     int maxLines = 1,
-    int minLines,
+    int? minLines,
     bool expands = false,
-    int maxLength,
-    VoidCallback onEditingComplete,
-    ValueChanged<DateTime> onFieldSubmitted,
+    int? maxLength,
+    VoidCallback? onEditingComplete,
+    ValueChanged<DateTime?>? onFieldSubmitted,
     // FormFieldSetter<String> onSaved,
     // FormFieldValidator<String> validator,
-    List<TextInputFormatter> inputFormatters,
+    List<TextInputFormatter>? inputFormatters,
     // bool enabled = true,
     double cursorWidth = 2.0,
-    Radius cursorRadius,
-    Color cursorColor,
-    Brightness keyboardAppearance,
+    Radius? cursorRadius,
+    Color? cursorColor,
+    Brightness? keyboardAppearance,
     EdgeInsets scrollPadding = const EdgeInsets.all(20.0),
     bool enableInteractiveSelection = true,
-    InputCounterWidgetBuilder buildCounter,
+    InputCounterWidgetBuilder? buildCounter,
   }) : super(
             key: key,
             autovalidate: autovalidate,
@@ -71,7 +71,7 @@ class DateTimeField extends FormField<DateTime> {
             validator: validator,
             onSaved: onSaved,
             builder: (field) {
-              final _DateTimeFieldState state = field;
+              final _DateTimeFieldState state = field as _DateTimeFieldState;
               final InputDecoration effectiveDecoration = (decoration ??
                       const InputDecoration())
                   .applyDefaults(Theme.of(field.context).inputDecorationTheme);
@@ -129,7 +129,7 @@ class DateTimeField extends FormField<DateTime> {
   final DateFormat format;
 
   /// Called when the date chooser dialog should be shown.
-  final Future<DateTime> Function(BuildContext context, DateTime currentValue)
+  final Future<DateTime> Function(BuildContext context, DateTime? currentValue)
       onShowPicker;
 
   /// The [InputDecoration.suffixIcon] to show when the field has text. Tapping
@@ -137,16 +137,16 @@ class DateTimeField extends FormField<DateTime> {
   /// behavior. Also, setting the suffix icon yourself will override this option.
   final Icon resetIcon;
 
-  final TextEditingController controller;
-  final FocusNode focusNode;
+  final TextEditingController? controller;
+  final FocusNode? focusNode;
   final bool readOnly;
-  final void Function(DateTime value) onChanged;
+  final void Function(DateTime? value)? onChanged;
 
   @override
   _DateTimeFieldState createState() => _DateTimeFieldState();
 
   /// Returns an empty string if [DateFormat.format()] throws or [date] is null.
-  static String tryFormat(DateTime date, DateFormat format) {
+  static String tryFormat(DateTime? date, DateFormat format) {
     if (date != null) {
       try {
         return format.format(date);
@@ -158,7 +158,7 @@ class DateTimeField extends FormField<DateTime> {
   }
 
   /// Returns null if [format.parse()] throws.
-  static DateTime tryParse(String string, DateFormat format) {
+  static DateTime? tryParse(String string, DateFormat format) {
     if (string?.isNotEmpty ?? false) {
       try {
         return format.parse(string);
@@ -178,17 +178,17 @@ class DateTimeField extends FormField<DateTime> {
 }
 
 class _DateTimeFieldState extends FormFieldState<DateTime> {
-  TextEditingController _controller;
-  FocusNode _focusNode;
+  TextEditingController? _controller;
+  FocusNode? _focusNode;
   bool isShowingDialog = false;
   bool hadFocus = false;
 
   @override
-  DateTimeField get widget => super.widget;
+  DateTimeField get widget => super.widget as DateTimeField;
 
   TextEditingController get _effectiveController =>
-      widget.controller ?? _controller;
-  FocusNode get _effectiveFocusNode => widget.focusNode ?? _focusNode;
+      widget.controller ?? _controller!;
+  FocusNode get _effectiveFocusNode => widget.focusNode ?? _focusNode!;
 
   bool get hasFocus => _effectiveFocusNode.hasFocus;
   bool get hasText => _effectiveController.text.isNotEmpty;
@@ -197,12 +197,12 @@ class _DateTimeFieldState extends FormFieldState<DateTime> {
   void initState() {
     super.initState();
     if (widget.controller == null) {
-      _controller = TextEditingController(text: format(widget.initialValue));
-      _controller.addListener(_handleControllerChanged);
+      _controller = TextEditingController(text: format(widget.initialValue))
+      ..addListener(_handleControllerChanged);
     }
     if (widget.focusNode == null) {
-      _focusNode = FocusNode();
-      _focusNode.addListener(_handleFocusChanged);
+      _focusNode = FocusNode()
+        ..addListener(_handleFocusChanged);
     }
     widget.controller?.addListener(_handleControllerChanged);
     widget.focusNode?.addListener(_handleFocusChanged);
@@ -217,11 +217,11 @@ class _DateTimeFieldState extends FormFieldState<DateTime> {
 
       if (oldWidget.controller != null && widget.controller == null) {
         _controller =
-            TextEditingController.fromValue(oldWidget.controller.value);
-        _controller.addListener(_handleControllerChanged);
+            TextEditingController.fromValue(oldWidget.controller!.value)
+        ..addListener(_handleControllerChanged);
       }
       if (widget.controller != null) {
-        setValue(parse(widget.controller.text));
+        setValue(parse(widget.controller!.text));
         // Release the controller since it wont be used
         if (oldWidget.controller == null) {
           _controller?.dispose();
@@ -234,8 +234,8 @@ class _DateTimeFieldState extends FormFieldState<DateTime> {
       widget.focusNode?.addListener(_handleFocusChanged);
 
       if (oldWidget.focusNode != null && widget.focusNode == null) {
-        _focusNode = FocusNode();
-        _focusNode.addListener(_handleFocusChanged);
+        _focusNode = FocusNode()
+        ..addListener(_handleFocusChanged);
       }
       if (widget.focusNode != null && oldWidget.focusNode == null) {
         // Release the focus node since it wont be used
@@ -246,8 +246,8 @@ class _DateTimeFieldState extends FormFieldState<DateTime> {
   }
 
   @override
-  void didChange(DateTime value) {
-    if (widget.onChanged != null) widget.onChanged(value);
+  void didChange(DateTime? value) {
+    if (widget.onChanged != null) widget.onChanged!(value);
     super.didChange(value);
   }
 
@@ -279,8 +279,8 @@ class _DateTimeFieldState extends FormFieldState<DateTime> {
       didChange(parse(_effectiveController.text));
   }
 
-  String format(DateTime date) => DateTimeField.tryFormat(date, widget.format);
-  DateTime parse(String text) => DateTimeField.tryParse(text, widget.format);
+  String format(DateTime? date) => DateTimeField.tryFormat(date, widget.format);
+  DateTime? parse(String text) => DateTimeField.tryParse(text, widget.format);
 
   Future<void> requestUpdate() async {
     if (!isShowingDialog) {
@@ -312,12 +312,12 @@ class _DateTimeFieldState extends FormFieldState<DateTime> {
     // Fix for ripple effect throwing exception
     // and the field staying gray.
     // https://github.com/flutter/flutter/issues/36324
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance!.addPostFrameCallback((_) {
       setState(() => _effectiveController.clear());
     });
   }
 
-  bool shouldShowClearIcon([InputDecoration decoration]) =>
+  bool shouldShowClearIcon([InputDecoration? decoration]) =>
       widget.resetIcon != null &&
       (hasText || hasFocus) &&
       decoration?.suffixIcon == null;

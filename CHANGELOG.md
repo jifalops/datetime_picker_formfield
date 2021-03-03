@@ -1,3 +1,7 @@
+## [2.0.0] - March 04, 2021
+
+- migrates to dart null-safety
+
 ## [1.0.0] - December 30, 2019
 
 - `readOnly` is now the default.
