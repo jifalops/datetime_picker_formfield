@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -8,12 +10,19 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 
 const appName = 'DateTimeField Example';
 
-void main() => runApp(MaterialApp(
+void main() => runApp(MyApp());
+
+class MyApp extends StatelessWidget {
+  const MyApp({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
       title: appName,
       home: MyHomePage(),
-      theme: ThemeData.light().copyWith(
-          inputDecorationTheme:
-              InputDecorationTheme(border: OutlineInputBorder())),
+      theme: ThemeData.light().copyWith(inputDecorationTheme: InputDecorationTheme(border: OutlineInputBorder())),
       localizationsDelegates: [
         // ... app-specific localization delegate[s] here
         GlobalMaterialLocalizations.delegate,
@@ -26,7 +35,9 @@ void main() => runApp(MaterialApp(
         const Locale('fr'), // French
         const Locale('zh'), // Chinese
       ],
-    ));
+    );
+  }
+}
 
 class MyHomePage extends StatefulWidget {
   @override
@@ -38,11 +49,8 @@ class MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(title: Text(appName)),
-        body: ListView(
-          padding: EdgeInsets.all(24),
-          children: <Widget>[
-            DateTimeForm(),
-          ],
+        body: SingleChildScrollView(
+          child: Center(child: Container(constraints: BoxConstraints(maxWidth: 600), child: DateTimeForm())),
         ));
   }
 }
@@ -75,17 +83,17 @@ class _DateTimeFormState extends State<DateTimeForm> {
           SizedBox(height: 24),
           ComplexDateTimeField(),
           SizedBox(height: 24),
-          RaisedButton(
+          ElevatedButton(
             child: Text('Save'),
-            onPressed: () => formKey.currentState.save(),
+            onPressed: () => formKey.currentState?.save(),
           ),
-          RaisedButton(
+          ElevatedButton(
             child: Text('Reset'),
-            onPressed: () => formKey.currentState.reset(),
+            onPressed: () => formKey.currentState?.reset(),
           ),
-          RaisedButton(
+          ElevatedButton(
             child: Text('Validate'),
-            onPressed: () => formKey.currentState.validate(),
+            onPressed: () => formKey.currentState?.validate(),
           ),
         ],
       ),
@@ -122,11 +130,11 @@ class BasicTimeField extends StatelessWidget {
       DateTimeField(
         format: format,
         onShowPicker: (context, currentValue) async {
-          final time = await showTimePicker(
+          final TimeOfDay? time = await showTimePicker(
             context: context,
             initialTime: TimeOfDay.fromDateTime(currentValue ?? DateTime.now()),
           );
-          return DateTimeField.convert(time);
+          return time == null ? null : DateTimeField.convert(time);
         },
       ),
     ]);
@@ -150,8 +158,7 @@ class BasicDateTimeField extends StatelessWidget {
           if (date != null) {
             final time = await showTimePicker(
               context: context,
-              initialTime:
-                  TimeOfDay.fromDateTime(currentValue ?? DateTime.now()),
+              initialTime: TimeOfDay.fromDateTime(currentValue ?? DateTime.now()),
             );
             return DateTimeField.combine(date, time);
           } else {
@@ -170,7 +177,7 @@ class IosStylePickers extends StatefulWidget {
 
 class _IosStylePickersState extends State<IosStylePickers> {
   final format = DateFormat("yyyy-MM-dd HH:mm");
-  DateTime value;
+  DateTime? value;
 
   @override
   Widget build(BuildContext context) {
@@ -183,10 +190,22 @@ class _IosStylePickersState extends State<IosStylePickers> {
           await showCupertinoModalPopup(
               context: context,
               builder: (context) {
-                return CupertinoDatePicker(
-                  onDateTimeChanged: (DateTime date) {
-                    value = date;
-                  },
+                return BottomSheet(
+                  builder: (context) => Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        constraints: BoxConstraints(maxHeight: 200),
+                        child: CupertinoDatePicker(
+                          onDateTimeChanged: (DateTime date) {
+                            value = date;
+                          },
+                        ),
+                      ),
+                      TextButton(onPressed: () => Navigator.pop(context), child: Text('Ok')),
+                    ],
+                  ),
+                  onClosing: () {},
                 );
               });
           setState(() {});
@@ -206,10 +225,10 @@ class _ComplexDateTimeFieldState extends State<ComplexDateTimeField> {
   final format = DateFormat("yyyy-MM-dd HH:mm");
   final initialValue = DateTime.now();
 
-  bool autoValidate = false;
-  bool readOnly = true;
-  bool showResetIcon = true;
-  DateTime value = DateTime.now();
+  AutovalidateMode autoValidateMode = AutovalidateMode.onUserInteraction;
+  bool? readOnly = true;
+  bool? showResetIcon = true;
+  DateTime? value = DateTime.now();
   int changedCount = 0;
   int savedCount = 0;
 
@@ -228,15 +247,14 @@ class _ComplexDateTimeFieldState extends State<ComplexDateTimeField> {
           if (date != null) {
             final time = await showTimePicker(
               context: context,
-              initialTime:
-                  TimeOfDay.fromDateTime(currentValue ?? DateTime.now()),
+              initialTime: TimeOfDay.fromDateTime(currentValue ?? DateTime.now()),
             );
             return DateTimeField.combine(date, time);
           } else {
             return currentValue;
           }
         },
-        autovalidate: autoValidate,
+        autovalidateMode: autoValidateMode,
         validator: (date) => date == null ? 'Invalid date' : null,
         initialValue: initialValue,
         onChanged: (date) => setState(() {
@@ -247,15 +265,14 @@ class _ComplexDateTimeFieldState extends State<ComplexDateTimeField> {
           value = date;
           savedCount++;
         }),
-        resetIcon: showResetIcon ? Icon(Icons.delete) : null,
-        readOnly: readOnly,
-        decoration: InputDecoration(
-            helperText: 'Changed: $changedCount, Saved: $savedCount, $value'),
+        resetIcon: showResetIcon! ? Icon(Icons.delete) : null,
+        readOnly: readOnly!,
+        decoration: InputDecoration(helperText: 'Changed: $changedCount, Saved: $savedCount, $value'),
       ),
       CheckboxListTile(
         title: Text('autoValidate'),
-        value: autoValidate,
-        onChanged: (value) => setState(() => autoValidate = value),
+        value: autoValidateMode != AutovalidateMode.disabled,
+        onChanged: (value) => setState(() => autoValidateMode = AutovalidateMode.always),
       ),
       CheckboxListTile(
         title: Text('readOnly'),
@@ -283,10 +300,8 @@ class Clock24Example extends StatelessWidget {
           final time = await showTimePicker(
             context: context,
             initialTime: TimeOfDay.fromDateTime(currentValue ?? DateTime.now()),
-            builder: (context, child) => MediaQuery(
-                data: MediaQuery.of(context)
-                    .copyWith(alwaysUse24HourFormat: true),
-                child: child),
+            builder: (context, child) =>
+                MediaQuery(data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true), child: child!),
           );
           return DateTimeField.convert(time);
         },
@@ -318,8 +333,7 @@ class LocaleExample extends StatelessWidget {
           if (date != null) {
             final time = await showTimePicker(
               context: context,
-              initialTime:
-                  TimeOfDay.fromDateTime(currentValue ?? DateTime.now()),
+              initialTime: TimeOfDay.fromDateTime(currentValue ?? DateTime.now()),
               builder: (context, child) => Localizations.override(
                 context: context,
                 locale: Locale('zh'),

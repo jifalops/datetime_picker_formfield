@@ -165,10 +165,10 @@ class DateTimeField extends FormField<DateTime> {
   }
 
   /// Sets the hour and minute of a [DateTime] from a [TimeOfDay].
-  static DateTime combine(DateTime date, TimeOfDay time) =>
-      DateTime(date.year, date.month, date.day, time.hour, time.minute);
+  static DateTime combine(DateTime date, TimeOfDay? time) =>
+      DateTime(date.year, date.month, date.day, time?.hour ?? 0, time?.minute ?? 0);
 
-  static DateTime convert(TimeOfDay time) => DateTime(1, 1, 1, time.hour, time.minute);
+  static DateTime? convert(TimeOfDay? time) => time == null ? null : DateTime(1, 1, 1, time.hour, time.minute);
 }
 
 class _DateTimeFieldState extends FormFieldState<DateTime> {
