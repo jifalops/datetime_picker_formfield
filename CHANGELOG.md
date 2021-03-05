@@ -1,3 +1,7 @@
+## [2.0.0]
+
+- Support sound null safety.
+
 ## [1.0.0] - December 30, 2019
 
 - `readOnly` is now the default.
