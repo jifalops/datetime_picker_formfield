@@ -303,7 +303,7 @@ class _DateTimeFieldState extends FormFieldState<DateTime> {
     // Fix for ripple effect throwing exception
     // and the field staying gray.
     // https://github.com/flutter/flutter/issues/36324
-    WidgetsBinding.instance!.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       setState(() => _effectiveController!.clear());
     });
   }
