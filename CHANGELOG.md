@@ -1,3 +1,7 @@
+## [2.0.1]
+
+- Remove unnecessary null check on WidgetsBinding.instance (caused crash when building for iOS).
+
 ## [2.0.0]
 
 - Support sound null safety.
@@ -34,70 +38,70 @@
 
 ## [0.3.1] - July 14, 2019
 
-* Improved interaction with forms.
+- Improved interaction with forms.
 
 ## [0.3.0] - July 14, 2019
 
-* Rewrote widget to remove extraneous functionality and clean up the logic. It no
-longer calls the system date/time pickers for you, instead many common use cases
-are shown in the included example.
-* Renamed DateTimePickerFormField to DateTimeField.
-* Lots of bugfixes.
+- Rewrote widget to remove extraneous functionality and clean up the logic. It no
+  longer calls the system date/time pickers for you, instead many common use cases
+  are shown in the included example.
+- Renamed DateTimePickerFormField to DateTimeField.
+- Lots of bugfixes.
 
 ## [0.2.0] - May 29, 2019
 
-* Add [datePicker] and [timePicker] callback functions to enable full control of the system dialogs (material vs cupertino, language, theme, etc.)
-* Remove deprecated [dateOnly] and [TimePickerFormField]
-* Remove accidental log messages
-* Add [builder] param for localization and theming
+- Add [datePicker] and [timePicker] callback functions to enable full control of the system dialogs (material vs cupertino, language, theme, etc.)
+- Remove deprecated [dateOnly] and [TimePickerFormField]
+- Remove accidental log messages
+- Add [builder] param for localization and theming
 
 ## [0.1.8] - January 21, 2019
 
-* Remove state reference to widget (#22)
-* Allow DateTimePickerFormField to use time-only.
-* Deprecate TimePickerFormField.
+- Remove state reference to widget (#22)
+- Allow DateTimePickerFormField to use time-only.
+- Deprecate TimePickerFormField.
 
 ## [0.1.7] - November 25, 2018
 
-* Fix #11, previous time forgotten when `editable` is false.
+- Fix #11, previous time forgotten when `editable` is false.
 
 ## [0.1.6] - November 5, 2018
 
-* Add `editable` option to `TimePickerFormField`.
+- Add `editable` option to `TimePickerFormField`.
 
 ## [0.1.5] - November 2, 2018
 
-* Add `editable` option to disable manual editing and always show the picker(s) when the field gains focus.
+- Add `editable` option to disable manual editing and always show the picker(s) when the field gains focus.
 
 ## [0.1.4] - October 16, 2018
 
-* Setting `initialTime` to `null` will cause it to start at the current time when shown.
-* Add screenshot to readme.
+- Setting `initialTime` to `null` will cause it to start at the current time when shown.
+- Add screenshot to readme.
 
 ## [0.1.3] - August 12, 2018
 
-* Add remaining parameters from showDatePicker().
+- Add remaining parameters from showDatePicker().
 
 ## [0.1.2] - August 9, 2018
 
-* Fix autovalidate setting.
+- Fix autovalidate setting.
 
 ## [0.1.1] - July 21, 2018
 
-* Fix and improve documentation.
+- Fix and improve documentation.
 
 ## [0.1.0] - July 21, 2018
 
-* Support Dart 2.0
+- Support Dart 2.0
 
 ## [0.0.3] - June 13, 2018
 
-* Added License (MIT).
+- Added License (MIT).
 
 ## [0.0.2] - June 13, 2018
 
-* Fix pubspec.yaml Flutter SDK version requirements.
+- Fix pubspec.yaml Flutter SDK version requirements.
 
 ## [0.0.1] - June 13, 2018
 
-* Initial release.
+- Initial release.
