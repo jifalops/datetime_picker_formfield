@@ -1,6 +1,6 @@
 name: datetime_picker_formfield
 description: A TextFormField that emits DateTimes and helps show Material, Cupertino, and other style picker dialogs.
-version: 2.0.0
+version: 2.0.1
 homepage: https://github.com/jifalops/datetime_picker_formfield
 
 dependencies:
@@ -12,5 +12,5 @@ dev_dependencies:
     sdk: flutter
 
 environment:
-  sdk: '>=2.12.0 <3.0.0'
-  flutter: '>=2.0.0 < 3.0.0'
+  sdk: ">=2.12.0 <3.0.0"
+  flutter: ">=2.0.0 < 4.0.0"
